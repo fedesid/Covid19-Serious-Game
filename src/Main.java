@@ -3,6 +3,5 @@ public class Main {
 
         GameFrame gframe = new GameFrame("Covid");
 
-
     }
 }

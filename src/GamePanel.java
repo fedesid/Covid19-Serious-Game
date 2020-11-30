@@ -10,10 +10,11 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public static final int SCREEN_WIDTH = 900;
     static final int SCREEN_HEIGHT = 600;
-    static final int DELAY = 1;
+    static final int DELAY = 2;
     boolean running = false;
     Timer timer;
     Random random;
+    InputHandler input;
     int tempX;
     int tempY;
     public boolean[] keyList = new boolean[4];
@@ -30,14 +31,16 @@ public class GamePanel extends JPanel implements ActionListener {
         this.setBackground(new Color(0x008C1C));
         this.setFocusable(true);
         this.startGame();
-        this.addKeyListener(new MyKeyAdapter());
+        //this.addKeyListener(new MyKeyAdapter());
     }
 
     public void startGame(){
+        input = new InputHandler(this);
         random = new Random();
-        player = new Player("Hi", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT),1, Color.red);
+        player = new Player("F", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT),1, Color.red, input);
         gel = new Gel(1, random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT));
 
+        System.out.println(gel.itemXpos + " " + gel.itemYpos);
         itemsOnScreen.add(gel);
 
         running = true;
@@ -62,25 +65,25 @@ public class GamePanel extends JPanel implements ActionListener {
                 tempY = (player.ypos - (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
             }
 
-            if( tempY <= 0){
+            if( player.getYpos() < 0){
                 System.out.println("Top Border");
                 player.ypos++;
                 player.direction = 'S';
                 break;
             }
-            if( tempX <= 0){
+            if( player.getXpos() < 0){
                 player.xpos++;
                 System.out.println("Left Border");
                 player.direction = 'S';
                 break;
             }
-            if( tempY >= SCREEN_HEIGHT){
+            if( tempY > SCREEN_HEIGHT){
                 player.ypos--;
                 System.out.println("Bottom Border");
                 player.direction = 'S';
                 break;
             }
-            if( tempX >= SCREEN_WIDTH){
+            if( tempX > SCREEN_WIDTH){
                 player.xpos--;
                 System.out.println("Right Border");
                 player.direction = 'S';
@@ -109,7 +112,7 @@ public class GamePanel extends JPanel implements ActionListener {
                     tempY = (player.ypos - (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
                 }
 
-
+                //(System.out.println(tempX + " " + tempY);
                 if( (tempX == item.itemXpos) && (tempY == item.itemYpos) ){
                     System.out.println(item.name);
                 }
@@ -125,9 +128,9 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void draw(Graphics g){
-
         player.draw(g);
         gel.draw(g);
+
     }
 
 
@@ -135,85 +138,11 @@ public class GamePanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
 
         if(running){
-            if(moving){
-                player.move(1,1);
-            }
 
+            player.movePlayer();
             checkCollision();
-            //checkItem();
+            checkItem();
         }
         repaint();
-    }
-
-    public class MyKeyAdapter extends KeyAdapter {
-
-        boolean[] keyList = {KeyEvent.VK_W == 'W', KeyEvent.VK_A == 'A', KeyEvent.VK_S == 'S', KeyEvent.VK_D == 'D'};
-
-
-        @Override
-        public void keyTyped(KeyEvent e){
-            //System.out.println("TYPED: " + e.getKeyChar());
-        }
-
-        @Override
-        public void keyReleased(KeyEvent e){
-
-            //System.out.println(keyList);
-            //System.out.println( "RELEASED: " + e.getKeyChar());
-            switch (e.getKeyCode()){
-                case KeyEvent.VK_W:
-                case KeyEvent.VK_S:
-                case KeyEvent.VK_A:
-                case KeyEvent.VK_D:
-                    //moving = false;
-                    //player.direction = 'S';
-                    break;
-            }
-        }
-
-        @Override
-        public void keyPressed(KeyEvent e){
-            //System.out.println("PRESSED: " + e.getKeyChar());
-            System.out.println(keyList[0]);
-            //System.out.println(keyList);
-                switch (e.getKeyCode()) {
-                    case KeyEvent.VK_W:
-
-                        if (player.direction == 'D') {
-                            player.direction = 'S'; //stop position
-                            break;
-                        }
-                        moving = true;
-                        player.direction = 'U';
-                        break;
-                    case KeyEvent.VK_S:
-
-                        if (player.direction == 'U') {
-                            player.direction = 'S'; //stop position
-                            break;
-                        }
-                        moving = true;
-                        player.direction = 'D';
-                        break;
-                    case KeyEvent.VK_A:
-
-                        if (player.direction == 'R') {
-                            player.direction = 'S'; //stop position
-                            break;
-                        }
-                        moving = true;
-                        player.direction = 'L';
-                        break;
-                    case KeyEvent.VK_D:
-
-                        if (player.direction == 'L') {
-                            player.direction = 'S'; //stop position
-                            break;
-                        }
-                        moving = true;
-                        player.direction = 'R';
-                        break;
-                }
-        }
     }
 }

@@ -36,6 +36,18 @@ public class Player extends Entity {
             case 'R':
                 xpos += dx;
                 break;
+            case 'X':
+                xpos += dx;
+                ypos += -dy;
+            case 'Y':
+                xpos += dx;
+                ypos += dy;
+            case 'Z':
+                xpos += -dx;
+                ypos += dy;
+            case 'N':
+                xpos += -dx;
+                ypos += -dy;
             case 'S':
                 break;
         }

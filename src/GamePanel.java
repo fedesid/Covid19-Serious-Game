@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.security.Key;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,6 +16,9 @@ public class GamePanel extends JPanel implements ActionListener {
     Random random;
     int tempX;
     int tempY;
+    public boolean[] keyList = new boolean[4];
+
+    boolean moving = false;
 
     static ArrayList<Item> itemsOnScreen = new ArrayList<>();
     Player player;
@@ -43,17 +47,28 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void checkCollision(){
 
-        for(int i=0; i<4; i+=90){
-            tempX = (int) (player.xpos + Math.cos(i)) + player.PLAYER_SIZE;
-            tempY = (int) (player.ypos + Math.sin(i)) + player.PLAYER_SIZE;
+        for(int i=0; i<360; i+=90){
+            if(i < 90){
+                tempX = (player.xpos + (int) Math.cos(Math.toRadians(i)) *player.PLAYER_SIZE);
+                tempY = (player.ypos - (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
+            }else if(i < 180){
+                tempX = (player.xpos + (int) Math.cos(Math.toRadians(i)) *player.PLAYER_SIZE);
+                tempY = (player.ypos + (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
+            }else if(i < 270){
+                tempX = (player.xpos - (int) Math.cos(Math.toRadians(i)) *player.PLAYER_SIZE);
+                tempY = (player.ypos + (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
+            }else {
+                tempX = (player.xpos - (int) Math.cos(Math.toRadians(i)) *player.PLAYER_SIZE);
+                tempY = (player.ypos - (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
+            }
 
-            if( tempY <= 38){
+            if( tempY <= 0){
                 System.out.println("Top Border");
                 player.ypos++;
                 player.direction = 'S';
                 break;
             }
-            if( tempX <= 38){
+            if( tempX <= 0){
                 player.xpos++;
                 System.out.println("Left Border");
                 player.direction = 'S';
@@ -80,8 +95,20 @@ public class GamePanel extends JPanel implements ActionListener {
         for(Item item : itemsOnScreen){
 
             for(int i=0; i<360; i++) {
-                tempX = (int) (player.xpos + Math.cos(i)) + player.PLAYER_SIZE;
-                tempY = (int) (player.ypos + Math.sin(i)) + player.PLAYER_SIZE;
+                if(i < 90){
+                    tempX = (player.xpos + (int) Math.cos(Math.toRadians(i)) *player.PLAYER_SIZE);
+                    tempY = (player.ypos - (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
+                }else if(i < 180){
+                    tempX = (player.xpos + (int) Math.cos(Math.toRadians(i)) *player.PLAYER_SIZE);
+                    tempY = (player.ypos + (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
+                }else if(i < 270){
+                    tempX = (player.xpos - (int) Math.cos(Math.toRadians(i)) *player.PLAYER_SIZE);
+                    tempY = (player.ypos + (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
+                }else {
+                    tempX = (player.xpos - (int) Math.cos(Math.toRadians(i)) *player.PLAYER_SIZE);
+                    tempY = (player.ypos - (int) Math.sin(Math.toRadians(i)) *player.PLAYER_SIZE);
+                }
+
 
                 if( (tempX == item.itemXpos) && (tempY == item.itemYpos) ){
                     System.out.println(item.name);
@@ -108,52 +135,85 @@ public class GamePanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent actionEvent) {
 
         if(running){
-            player.move(1,1);
+            if(moving){
+                player.move(1,1);
+            }
+
             checkCollision();
-            checkItem();
+            //checkItem();
         }
         repaint();
     }
 
-    public class MyKeyAdapter extends KeyAdapter{
+    public class MyKeyAdapter extends KeyAdapter {
+
+        boolean[] keyList = {KeyEvent.VK_W == 'W', KeyEvent.VK_A == 'A', KeyEvent.VK_S == 'S', KeyEvent.VK_D == 'D'};
+
+
+        @Override
+        public void keyTyped(KeyEvent e){
+            //System.out.println("TYPED: " + e.getKeyChar());
+        }
+
+        @Override
+        public void keyReleased(KeyEvent e){
+
+            //System.out.println(keyList);
+            //System.out.println( "RELEASED: " + e.getKeyChar());
+            switch (e.getKeyCode()){
+                case KeyEvent.VK_W:
+                case KeyEvent.VK_S:
+                case KeyEvent.VK_A:
+                case KeyEvent.VK_D:
+                    //moving = false;
+                    //player.direction = 'S';
+                    break;
+            }
+        }
 
         @Override
         public void keyPressed(KeyEvent e){
-            System.out.println(e.getKeyChar());
+            //System.out.println("PRESSED: " + e.getKeyChar());
+            System.out.println(keyList[0]);
+            //System.out.println(keyList);
+                switch (e.getKeyCode()) {
+                    case KeyEvent.VK_W:
 
-            switch (e.getKeyCode()){
-                case KeyEvent.VK_W:
-                    if(player.direction == 'D'){
-                        player.direction = 'S';
+                        if (player.direction == 'D') {
+                            player.direction = 'S'; //stop position
+                            break;
+                        }
+                        moving = true;
+                        player.direction = 'U';
                         break;
-                    }
-                    player.direction = 'U';
-                    break;
-                case KeyEvent.VK_S:
-                    if(player.direction == 'U'){
-                        player.direction = 'S';
-                        break;
-                    }
-                    player.direction = 'D';
-                    break;
-                case KeyEvent.VK_A:
-                    if(player.direction == 'R'){
-                        player.direction = 'S';
-                        break;
-                    }
-                    player.direction = 'L';
-                    break;
-                case KeyEvent.VK_D:
-                    if(player.direction == 'L'){
-                        player.direction = 'S';
-                        break;
-                    }
-                    player.direction = 'R';
-                    break;
-            }
+                    case KeyEvent.VK_S:
 
+                        if (player.direction == 'U') {
+                            player.direction = 'S'; //stop position
+                            break;
+                        }
+                        moving = true;
+                        player.direction = 'D';
+                        break;
+                    case KeyEvent.VK_A:
 
+                        if (player.direction == 'R') {
+                            player.direction = 'S'; //stop position
+                            break;
+                        }
+                        moving = true;
+                        player.direction = 'L';
+                        break;
+                    case KeyEvent.VK_D:
 
+                        if (player.direction == 'L') {
+                            player.direction = 'S'; //stop position
+                            break;
+                        }
+                        moving = true;
+                        player.direction = 'R';
+                        break;
+                }
         }
     }
 }

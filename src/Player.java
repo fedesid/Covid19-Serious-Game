@@ -3,7 +3,7 @@ import java.awt.*;
 public class Player extends Entity {
 
     String name;
-    static final int PLAYER_SIZE = 40;
+    int playerSize;
     Inventory inv;
     int xpos;
     int ypos;
@@ -12,10 +12,11 @@ public class Player extends Entity {
     Color col;
     InputHandler input;
 
-    public Player(String name, int xpos, int ypos, int speed, Color col, InputHandler input){
+    public Player(String name, int xpos, int ypos, int size, int speed, Color col, InputHandler input){
         this.name = name;
         this.xpos = xpos;
         this.ypos = ypos;
+        this.playerSize = size;
         this.col = col;
         this.input = input;
     }
@@ -50,6 +51,7 @@ public class Player extends Entity {
     public int getYpos(){
         return this.ypos;
     }
+    public int getPlayerSize(){return this.playerSize;}
 
     @Override
     public void paintComponent(Graphics g) {
@@ -59,6 +61,6 @@ public class Player extends Entity {
     @Override
     public void draw(Graphics g) {
         g.setColor(col);
-        g.fillOval(this.xpos,this.ypos,PLAYER_SIZE, PLAYER_SIZE);
+        g.fillOval(this.xpos,this.ypos, playerSize, playerSize);
     }
 }

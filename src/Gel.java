@@ -2,8 +2,8 @@ import java.awt.*;
 
 public class Gel extends Item {
 
-    public Gel(int quantity, int xpos, int ypos){
-        super(quantity, xpos, ypos);
+    public Gel(int quantity, int xpos, int ypos, int size){
+        super(quantity, xpos, ypos, size);
         name = "Gel";
     }
 
@@ -15,6 +15,6 @@ public class Gel extends Item {
     @Override
     public void draw(Graphics g) {
         g.setColor(new Color(0x6EFFFF));
-        g.fillRect(itemXpos, itemYpos, 10, 10);
+        g.fillRect(itemXpos, itemYpos, size, size);
     }
 }

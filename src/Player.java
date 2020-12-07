@@ -7,6 +7,7 @@ public class Player extends Entity {
     Inventory inv;
     int xpos;
     int ypos;
+    int speed;
 
     char direction;
     Color col;
@@ -19,13 +20,14 @@ public class Player extends Entity {
         this.playerSize = size;
         this.col = col;
         this.input = input;
+        this.speed = speed;
     }
 
     //displacement x, displacement y
     public void move(int dx, int dy){
 
-        this.xpos += dx;
-        this.ypos += dy;
+        this.xpos += dx*speed;
+        this.ypos += dy*speed;
     }
 
     public void movePlayer(){
@@ -52,6 +54,15 @@ public class Player extends Entity {
         return this.ypos;
     }
     public int getPlayerSize(){return this.playerSize;}
+    public int getSpeed(){return this.speed;}
+
+    public void setXpos(int xpos) {
+        this.xpos = xpos;
+    }
+
+    public void setYpos(int ypos) {
+        this.ypos = ypos;
+    }
 
     @Override
     public void paintComponent(Graphics g) {
@@ -60,6 +71,14 @@ public class Player extends Entity {
 
     @Override
     public void draw(Graphics g) {
+
+
+        g.setColor(new Color(0));
+        for(int i=0; i<1; i++){
+            g.drawOval(this.xpos,this.ypos, playerSize+1, playerSize+1);
+
+        }
+
         g.setColor(col);
         g.fillOval(this.xpos,this.ypos, playerSize, playerSize);
     }

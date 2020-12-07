@@ -9,22 +9,24 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public static final int SCREEN_WIDTH = 900;
     public static final int SCREEN_HEIGHT = 600;
-    static final int DELAY = 2;
+    static final int DELAY = 20;
     boolean running = false;
     Timer timer;
     Random random;
     InputHandler input;
     Inventory inventory;
+
     int tempX;
     int tempY;
     public boolean[] keyList = new boolean[4];
 
     boolean moving = false;
 
+    static ArrayList<Entity> entitiesOnScreen = new ArrayList<>();
     static ArrayList<Item> itemsOnScreen = new ArrayList<Item>();
     Player player;
     Gel gel;
-
+    Virus virus;
 
     public GamePanel(){
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
@@ -39,9 +41,23 @@ public class GamePanel extends JPanel implements ActionListener {
         inventory = new Inventory(this);
         input = new InputHandler(this);
         random = new Random();
-        player = new Player("F", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,1, Color.red, input);
+        player = new Player("F", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,7, Color.red, input);
         gel = new Gel(1, random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT), 15);
+        virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), 30, random.nextInt(player.getSpeed()-2)+1);
+        virus.setPlayer(player);
 
+        Virus virus2 = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), 30, random.nextInt(player.getSpeed()-2)+1);
+        virus2.setPlayer(player);
+
+        for(int i=0; i<5; i++){
+            Virus virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), 30, random.nextInt(player.getSpeed()-2)+1);
+            virus.setPlayer(player);
+            entitiesOnScreen.add(virus);
+
+        }
+
+        entitiesOnScreen.add(virus);
+        entitiesOnScreen.add(virus2);
         System.out.println(itemsOnScreen.isEmpty());
         itemsOnScreen.add(gel);
         System.out.println(itemsOnScreen.isEmpty());
@@ -54,7 +70,32 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void checkCollision(){
 
-        for(int i=0; i<360; i++) {
+        double distance;
+
+        // top border
+        if(player.getYpos() < 0){
+            player.setYpos(0);
+        }
+
+        // right border
+        distance = calcDistance(player.getXpos(), player.getYpos(), SCREEN_WIDTH, player.getYpos());
+        if(distance < player.getPlayerSize()){
+            player.setXpos(SCREEN_WIDTH - player.getPlayerSize());
+        }
+
+        // bottom border
+        distance = calcDistance(player.getXpos(), player.getYpos(), player.getXpos(), SCREEN_HEIGHT);
+        if(distance < player.getPlayerSize()){
+            player.setYpos(SCREEN_HEIGHT - player.getPlayerSize());
+        }
+
+        // left border
+        if(player.getXpos() < 0){
+            player.setXpos(0);
+        }
+
+        /*
+        for(int i=0; i<360; i+=90) {
             if(i <= 90){
                 tempX = (player.xpos + (int) Math.cos(Math.toRadians(i)) *player.playerSize);
                 tempY = (player.ypos - (int) Math.sin(Math.toRadians(i)) *player.playerSize);
@@ -96,14 +137,16 @@ public class GamePanel extends JPanel implements ActionListener {
             }
 
         }
+
+         */
     }
 
-    public double calcDistance(int x1, int y1, int x2, int y2){
+    public static double calcDistance(int x1, int y1, int x2, int y2){
         return Math.sqrt( Math.pow(Math.abs(x1-x2) , 2) + Math.pow( Math.abs( y1-y2) , 2) );
     }
 
     public void checkItem(){
-        
+
         if( itemsOnScreen.size() != 0 ){
             for(Item item : itemsOnScreen){
 
@@ -139,6 +182,12 @@ public class GamePanel extends JPanel implements ActionListener {
     public void draw(Graphics g){
         player.draw(g);
         inventory.draw(g);
+
+        for(Entity virus : entitiesOnScreen){
+            virus.chase();
+            virus.draw(g);
+
+        }
 
         for(Item item : itemsOnScreen){
             item.draw(g);

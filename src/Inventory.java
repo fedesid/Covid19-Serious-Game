@@ -39,6 +39,7 @@ public class Inventory {
             g.drawLine( xpos+i, ypos, xpos+i, ypos+height);
         }
 
+        g.setFont(new Font("Lato", Font.ITALIC, 25));
         g.drawString("Gel", xpos, ypos);
         g.drawString("Mask", xpos + width/3, ypos);
         g.drawString("Vaccine", xpos + 2*(width/3), ypos);

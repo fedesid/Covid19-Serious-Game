@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -14,6 +15,7 @@ public class GamePanel extends JPanel implements ActionListener {
     Timer timer;
     Random random;
     InputHandler input;
+    MouseHandler mouse;
     Inventory inventory;
 
     int tempX;
@@ -22,13 +24,14 @@ public class GamePanel extends JPanel implements ActionListener {
 
     boolean moving = false;
 
-    static ArrayList<Entity> entitiesOnScreen = new ArrayList<>();
+    static ArrayList<Bullet> bulletsOnScreen = new ArrayList<>();
+    static ArrayList<Virus> virusOnScreen = new ArrayList<>();
     static ArrayList<Item> itemsOnScreen = new ArrayList<Item>();
     Player player;
     Gel gel;
     Virus virus;
 
-    public GamePanel(){
+    public GamePanel() throws IOException {
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(new Color(0x008C1C));
         this.setFocusable(true);
@@ -36,33 +39,25 @@ public class GamePanel extends JPanel implements ActionListener {
         //this.addKeyListener(new MyKeyAdapter());
     }
 
-    public void startGame(){
+    public void startGame() throws IOException {
 
         inventory = new Inventory(this);
         input = new InputHandler(this);
+        mouse = new MouseHandler(this);
         random = new Random();
-        player = new Player("F", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,7, Color.red, input);
-        gel = new Gel(1, random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT), 15);
-        virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), 30, random.nextInt(player.getSpeed()-2)+1);
-        virus.setPlayer(player);
 
-        Virus virus2 = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), 30, random.nextInt(player.getSpeed()-2)+1);
-        virus2.setPlayer(player);
+        player = new Player("F", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,7, Color.red, input);
 
         for(int i=0; i<5; i++){
-            Virus virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), 30, random.nextInt(player.getSpeed()-2)+1);
+            Virus virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), 100, random.nextInt(player.getSpeed()-2)+1);
             virus.setPlayer(player);
-            entitiesOnScreen.add(virus);
+            virusOnScreen.add(virus);
 
         }
 
-        entitiesOnScreen.add(virus);
-        entitiesOnScreen.add(virus2);
-        System.out.println(itemsOnScreen.isEmpty());
+        gel = new Gel(1, random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT));
+
         itemsOnScreen.add(gel);
-        System.out.println(itemsOnScreen.isEmpty());
-
-
         running = true;
         timer = new Timer(DELAY, this);
         timer.start();
@@ -93,52 +88,15 @@ public class GamePanel extends JPanel implements ActionListener {
         if(player.getXpos() < 0){
             player.setXpos(0);
         }
+    }
 
-        /*
-        for(int i=0; i<360; i+=90) {
-            if(i <= 90){
-                tempX = (player.xpos + (int) Math.cos(Math.toRadians(i)) *player.playerSize);
-                tempY = (player.ypos - (int) Math.sin(Math.toRadians(i)) *player.playerSize);
-            }else if(i <= 180){
-                tempX = (player.xpos - (int) Math.cos(Math.toRadians(i)) *player.playerSize);
-                tempY = (player.ypos - (int) Math.sin(Math.toRadians(i)) *player.playerSize);
-            }else if(i <= 270){
-                tempX = (player.xpos - (int) Math.cos(Math.toRadians(i)) *player.playerSize);
-                tempY = (player.ypos + (int) Math.sin(Math.toRadians(i)) *player.playerSize);
-            }else {
-                tempX = (player.xpos + (int) Math.cos(Math.toRadians(i)) *player.playerSize);
-                tempY = (player.ypos + (int) Math.sin(Math.toRadians(i)) *player.playerSize);
-            }
-
-            if( player.getYpos() < 0){
-                System.out.println("Top Border");
-                player.ypos++;
-                player.direction = 'S';
-                break;
-            }
-            if( player.getXpos() < 0){
-                player.xpos++;
-                System.out.println("Left Border");
-                player.direction = 'S';
-                break;
-            }
-            if( tempY > SCREEN_HEIGHT - player.playerSize){
-                player.ypos--;
-                System.out.println("Bottom Border");
-                player.direction = 'S';
-                break;
-            }
-            if( tempX > SCREEN_WIDTH){
-                player.xpos--;
-                System.out.println("Right Border");
-                player.direction = 'S';
-
-                break;
-            }
-
-        }
-
-         */
+    public static double calcAngleSin(int x1, int y1, int x2, int y2){
+        double hyp = calcDistance(x1, y1, x2, y2);
+        return Math.asin( (y1-y2)/hyp );
+    }
+    public static double calcAngleCos(int x1, int y1, int x2, int y2){
+        double hyp = calcDistance(x1, y1, x2, y2);
+        return Math.acos( (x1-x2)/hyp )-Math.PI/2;
     }
 
     public static double calcDistance(int x1, int y1, int x2, int y2){
@@ -152,10 +110,10 @@ public class GamePanel extends JPanel implements ActionListener {
 
                 double distance = calcDistance(player.getXpos() + (player.getPlayerSize() /2), player.getYpos() + (player.getPlayerSize() /2), item.getItemXpos() + (item.getSize()/2), item.getItemYpos() + (item.getSize()/2));
 
-                if( distance <= player.playerSize /2 + item.size/2){
+                if( distance <= player.getPlayerSize() /2){
 
                     System.out.println("CONTACT");
-                    itemsOnScreen.add(new Gel(1, random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT), 15));
+                    itemsOnScreen.add(new Gel(1, random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT)));
 
                     switch (item.getClass().toString())
                     {
@@ -176,17 +134,25 @@ public class GamePanel extends JPanel implements ActionListener {
         super.paintComponent(g);
         draw(g);
 
-
     }
 
     public void draw(Graphics g){
         player.draw(g);
         inventory.draw(g);
 
-        for(Entity virus : entitiesOnScreen){
+        for(Bullet bullet : bulletsOnScreen){
+            bullet.move();
+            bullet.draw(g);
+
+            if( bullet.clear() ){ // deleting the bullets after they leave the screen
+                GamePanel.bulletsOnScreen.remove(bullet);
+                break;
+            }
+        }
+
+        for(Virus virus : virusOnScreen){
             virus.chase();
             virus.draw(g);
-
         }
 
         for(Item item : itemsOnScreen){

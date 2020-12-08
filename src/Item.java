@@ -5,17 +5,16 @@ public abstract class Item extends Entity {
     int quantity;
     int itemXpos;
     int itemYpos;
-    int size;
+    public static final int SIZE = 50;
 
-    public Item(int quantity, int xpos, int ypos, int size){
+    public Item(int quantity, int xpos, int ypos){
         this.quantity = quantity;
         this.itemXpos = xpos;
         this.itemYpos = ypos;
-        this.size = size;
     }
 
     public int getSize() {
-        return size;
+        return SIZE;
     }
 
     public int getItemXpos() {

@@ -11,8 +11,6 @@ public abstract class Entity {
         this.ypos = ypos;
     }
 
-    public void chase(){}
-
     public abstract void paintComponent(Graphics g);
 
     public abstract void draw(Graphics g);

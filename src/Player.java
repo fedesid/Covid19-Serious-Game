@@ -1,4 +1,9 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.awt.image.ImageObserver;
+import java.io.File;
+import java.io.IOException;
 
 public class Player extends Entity {
 
@@ -9,11 +14,21 @@ public class Player extends Entity {
     int ypos;
     int speed;
 
+    static BufferedImage sprite;
+
+    static {
+        try {
+            sprite = ImageIO.read(new File("src/Sprites/Country/italy.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     char direction;
     Color col;
     InputHandler input;
 
-    public Player(String name, int xpos, int ypos, int size, int speed, Color col, InputHandler input){
+    public Player(String name, int xpos, int ypos, int size, int speed, Color col, InputHandler input) throws IOException {
         this.name = name;
         this.xpos = xpos;
         this.ypos = ypos;
@@ -72,7 +87,9 @@ public class Player extends Entity {
     @Override
     public void draw(Graphics g) {
 
+        g.drawImage(sprite, xpos, ypos, playerSize, playerSize, null);
 
+/*
         g.setColor(new Color(0));
         for(int i=0; i<1; i++){
             g.drawOval(this.xpos,this.ypos, playerSize+1, playerSize+1);
@@ -81,5 +98,7 @@ public class Player extends Entity {
 
         g.setColor(col);
         g.fillOval(this.xpos,this.ypos, playerSize, playerSize);
+
+ */
     }
 }

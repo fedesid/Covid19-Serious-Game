@@ -1,4 +1,9 @@
+import javax.imageio.IIOImage;
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Virus extends Entity {
 
@@ -7,7 +12,17 @@ public class Virus extends Entity {
     double distance;
     int speed;
 
-    public Virus(int xpos, int ypos, int size, int speed){
+    static BufferedImage sprite;
+
+    static {
+        try {
+            sprite = ImageIO.read(new File("src/Sprites/Entities/virus.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Virus(int xpos, int ypos, int size, int speed) throws IOException {
         super(xpos, ypos);
         this.size=size;
         this.speed=speed;
@@ -17,7 +32,6 @@ public class Virus extends Entity {
         this.player = player;
     }
 
-    @Override
     public void chase(){
 
         //distance = GamePanel.calcDistance(xpos, ypos, player.getXpos(), player.getYpos());
@@ -46,6 +60,10 @@ public class Virus extends Entity {
     @Override
     public void draw(Graphics g) {
 
+
+        g.drawImage(sprite, xpos, ypos, size, size, null);
+
+        /*
         g.setColor(new Color(0x17000000, true));
         g.fillOval(xpos-100/speed,ypos-100/speed,200/speed,200/speed);
         g.setColor(new Color(0xFF0000));
@@ -59,14 +77,7 @@ public class Virus extends Entity {
             g.fillOval((int) (Math.cos(Math.toRadians(j))*size + xpos), (int) (Math.sin(Math.toRadians(j))*size + ypos), 5, 5);
         }
 
-/*
-        for(int i=0; i<360; i+=90){
-            g.drawLine( (int)Math.cos(Math.toRadians(i))+xpos, (int)Math.sin(Math.toRadians(i))+ypos, (int)Math.cos(Math.toRadians(i))+10+xpos, (int)Math.sin(Math.toRadians(i))+10+ypos);
-        }
-
- */
-
-        //g.fillOval(xpos, ypos, 20, 30);
+         */
 
     }
 }

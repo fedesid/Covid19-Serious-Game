@@ -1,6 +1,18 @@
+import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 
 public class Bullet extends Entity {
+    static BufferedImage sprite;
+    static {
+        try {
+            sprite = ImageIO.read(new File("src/Sprites/Entities/bullet.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     int xPos;
     int yPos;
@@ -51,8 +63,12 @@ public class Bullet extends Entity {
 
     @Override
     public void draw(Graphics g) {
-
+        g.drawImage(sprite, xPos, yPos, size, size, null);
+        /*
         g.setColor(new Color(0x9ACEFF));
         g.fillOval(xPos, yPos, size/2,size/3);
+
+         */
+
     }
 }

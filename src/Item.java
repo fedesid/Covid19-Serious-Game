@@ -5,12 +5,21 @@ public abstract class Item extends Entity {
     int quantity;
     int itemXpos;
     int itemYpos;
+
     public static final int SIZE = 50;
 
     public Item(int quantity, int xpos, int ypos){
         this.quantity = quantity;
         this.itemXpos = xpos;
         this.itemYpos = ypos;
+    }
+
+    public boolean collision(Player player){
+        double distance = GamePanel.calcDistance(player.getXpos() + (player.getPlayerSize() /2), player.getYpos() + (player.getPlayerSize() /2), this.getItemXpos() + (this.getSize()/2), this.getItemYpos() + (this.getSize()/2));
+        if( distance <= player.getPlayerSize() /2 + this.getSize()/4){
+            return true;
+        }
+        return false;
     }
 
     public int getSize() {
@@ -26,13 +35,5 @@ public abstract class Item extends Entity {
     }
 
     public abstract void draw(Graphics g);
-
-    public void upQuantity(){
-        quantity++;
-    }
-
-    public void downQuantity(){
-        quantity--;
-    }
 
 }

@@ -24,9 +24,14 @@ public class InputHandler implements KeyListener {
     public Key left = new Key();
     public Key right = new Key();
 
+    public Key one = new Key();
+    public Key two = new Key();
+    public Key three = new Key();
+
     @Override
     public void keyPressed(KeyEvent e) {
         toggleKey(e.getKeyCode(), true);
+        selectKey(e.getKeyCode(), true);
     }
 
     @Override
@@ -37,6 +42,27 @@ public class InputHandler implements KeyListener {
     @Override
     public void keyTyped(KeyEvent e) {
 
+    }
+
+    public void selectKey(int keyCode, boolean isSelected){
+
+        if (keyCode == KeyEvent.VK_1){
+            one.toggle(isSelected);
+            two.toggle(!isSelected);
+            three.toggle(!isSelected);
+        }
+        if (keyCode == KeyEvent.VK_2){
+            one.toggle(!isSelected);
+            two.toggle(isSelected);
+            three.toggle(!isSelected);
+        }
+        if (keyCode == KeyEvent.VK_3){
+            one.toggle(!isSelected);
+            two.toggle(!isSelected);
+            three.toggle(isSelected);
+        }
+
+        //System.out.println("one: " + one.pressed + " two: " + two.pressed + " three: " + three.pressed);
     }
 
     public void toggleKey(int keyCode, boolean isPressed){

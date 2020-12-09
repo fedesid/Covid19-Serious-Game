@@ -18,6 +18,7 @@ public class Virus extends Entity {
         try {
             sprite = ImageIO.read(new File("src/Sprites/Entities/virus.png"));
         } catch (IOException e) {
+            System.out.println("ERROR");
             e.printStackTrace();
         }
     }

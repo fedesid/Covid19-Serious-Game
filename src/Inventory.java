@@ -1,8 +1,11 @@
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Inventory {
-    int[] items;
+    //static ArrayList<Integer> items = new ArrayList<int>();
+    static ItemCount[] items;
     GamePanel gp;
+    InputHandler input;
     int quantity;
 
     int width = GamePanel.SCREEN_WIDTH/3;
@@ -12,25 +15,30 @@ public class Inventory {
 
     public Inventory(GamePanel gp){
 
+        ItemCount gel = new ItemCount();
+        ItemCount mask = new ItemCount();
+        ItemCount vaccine = new ItemCount();
+
         this.gp = gp;
-        items = new int[]{0, 0, 0};
+        /*
+        items.add(Gel.getCurrentQuantity());
+        items.add(Mask.getCurrentQuantity());
+        items.add(Vaccine.getCurrentQuantity());
+         */
+        items = new ItemCount[]{gel, mask, vaccine};
 
     }
 
-    public void upQuantity(){
-        quantity++;
+    public void linkInput(InputHandler input){
+        this.input = input;
     }
-
-    public void downQuantity(){
-        quantity--;
-    }
-
 
     public void paintComponent(Graphics g) {
 
     }
 
     public void draw(Graphics g) {
+
         g.setColor(Color.black);
 
         g.drawRect(xpos, ypos , width, height);
@@ -49,6 +57,18 @@ public class Inventory {
             g.drawString(String.valueOf(items[j]),xpos+i, ypos+height/2);
             j++;
         }
+
+        g.setColor(new Color(0x460041FF, true));
+        if(input.one.isPressed()){
+            g.fillRect(xpos, ypos, width/3, height);
+        }
+        if(input.two.isPressed()){
+            g.fillRect(xpos+width/3, ypos, width/3, height);
+        }
+        if(input.three.isPressed()){
+            g.fillRect(xpos+width/3*2, ypos, width/3, height);
+        }
+
     }
 
 }

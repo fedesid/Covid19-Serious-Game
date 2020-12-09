@@ -4,21 +4,22 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
-public class Gel extends Item {
+public class Vaccine extends Item {
 
     static BufferedImage sprite;
-
     static {
         try {
-            sprite = ImageIO.read(new File("src/Sprites/Entities/gel.png"));
+            sprite = ImageIO.read(new File("src/Sprites/Entities/vaccine.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Gel(int quantity, int xpos, int ypos){
+    int size = 40;
+
+    public Vaccine(int quantity, int xpos, int ypos) {
         super(quantity, xpos, ypos);
-        name = "Gel";
+        this.name = "Vaccine";
     }
 
     @Override
@@ -28,12 +29,7 @@ public class Gel extends Item {
 
     @Override
     public void draw(Graphics g) {
-
-        g.drawImage(sprite, itemXpos, itemYpos, (int) (SIZE/1.5), SIZE, null);
-        /*
-        g.setColor(new Color(0x6EFFFF));
-        g.fillRect(itemXpos, itemYpos, size, size);
-
-         */
+        g.drawImage(sprite, itemXpos, itemYpos, size, size, null);
     }
+
 }

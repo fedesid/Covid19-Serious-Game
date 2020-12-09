@@ -7,7 +7,6 @@ import java.util.Random;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-
     public static final int SCREEN_WIDTH = 900;
     public static final int SCREEN_HEIGHT = 600;
     static final int DELAY = 20;
@@ -44,6 +43,9 @@ public class GamePanel extends JPanel implements ActionListener {
         inventory = new Inventory(this);
         input = new InputHandler(this);
         mouse = new MouseHandler(this);
+
+        inventory.linkInput(input);
+        mouse.linkInput(input);
         random = new Random();
 
         player = new Player("F", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,7, Color.red, input);
@@ -55,9 +57,14 @@ public class GamePanel extends JPanel implements ActionListener {
 
         }
 
-        gel = new Gel(1, random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT));
+        gel = new Gel(1, random.nextInt(SCREEN_WIDTH-20)+10, random.nextInt(SCREEN_HEIGHT-20)+10);
+        Mask mask = new Mask(1, random.nextInt(SCREEN_WIDTH-20)+10, random.nextInt(SCREEN_HEIGHT-20)+10);
+        Vaccine vaccine = new Vaccine(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10);
 
         itemsOnScreen.add(gel);
+        itemsOnScreen.add(mask);
+        itemsOnScreen.add(vaccine);
+
         running = true;
         timer = new Timer(DELAY, this);
         timer.start();
@@ -108,17 +115,26 @@ public class GamePanel extends JPanel implements ActionListener {
         if( itemsOnScreen.size() != 0 ){
             for(Item item : itemsOnScreen){
 
-                double distance = calcDistance(player.getXpos() + (player.getPlayerSize() /2), player.getYpos() + (player.getPlayerSize() /2), item.getItemXpos() + (item.getSize()/2), item.getItemYpos() + (item.getSize()/2));
-
-                if( distance <= player.getPlayerSize() /2){
+                //TODO extrapolate this method (check distance between item and player) you could create a method inside the Item abstract class
+                if( item.collision(player) ){
 
                     System.out.println("CONTACT");
-                    itemsOnScreen.add(new Gel(1, random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_HEIGHT)));
+                    System.out.println(item.getClass().toString());
 
-                    switch (item.getClass().toString())
-                    {
-                        case "class Gel" :
-                            inventory.items[0] += 1;
+                    //TODO change the way the inventory works. Use classes instead of indexes i.e. Class mask, class gel, class vaccine
+
+                    if(item.getClass().toString().equals("class Gel")){
+                        Inventory.items[0].upCurrentCount();
+                        itemsOnScreen.add(new Gel(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
+
+                    }else if(item.getClass().toString().equals("class Mask")){
+                        Inventory.items[1].upCurrentCount();
+                        itemsOnScreen.add(new Mask(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
+
+                    }else if(item.getClass().toString().equals("class Vaccine")){
+                        Inventory.items[2].upCurrentCount();
+                        itemsOnScreen.add(new Vaccine(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
+
                     }
                     itemsOnScreen.remove(item);
                     break;

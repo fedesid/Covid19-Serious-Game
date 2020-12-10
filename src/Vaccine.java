@@ -17,8 +17,8 @@ public class Vaccine extends Item {
 
     int size = 40;
 
-    public Vaccine(int quantity, int xpos, int ypos) {
-        super(quantity, xpos, ypos);
+    public Vaccine(int xpos, int ypos) {
+        super(xpos, ypos);
         this.name = "Vaccine";
     }
 

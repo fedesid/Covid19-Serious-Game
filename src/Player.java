@@ -24,7 +24,7 @@ public class Player extends Entity {
 
     static {
         try {
-            sprite = ImageIO.read(new File("src/Sprites/Country/usa.png"));
+            sprite = ImageIO.read(new File("src/Sprites/Country/uk.png"));
             mask = ImageIO.read(new File("src/Sprites/Entities/maskOn.png"));
             hand = ImageIO.read(new File("src/Sprites/Entities/hand2.png"));
             gel = ImageIO.read(new File("src/Sprites/Entities/gel.png"));

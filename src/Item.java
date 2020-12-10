@@ -2,14 +2,12 @@ import java.awt.*;
 
 public abstract class Item extends Entity {
     String name;
-    int quantity;
     int itemXpos;
     int itemYpos;
 
     public static final int SIZE = 50;
 
-    public Item(int quantity, int xpos, int ypos){
-        this.quantity = quantity;
+    public Item(int xpos, int ypos){
         this.itemXpos = xpos;
         this.itemYpos = ypos;
     }

@@ -16,8 +16,8 @@ public class Gel extends Item {
         }
     }
 
-    public Gel(int quantity, int xpos, int ypos){
-        super(quantity, xpos, ypos);
+    public Gel(int xpos, int ypos){
+        super(xpos, ypos);
         name = "Gel";
     }
 

@@ -1,6 +1,7 @@
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.Timer;
+import java.util.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
@@ -10,11 +11,12 @@ import java.util.*;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-    public static final int SCREEN_WIDTH = 1150;
-    public static final int SCREEN_HEIGHT = 720;
+    public static final int SCREEN_WIDTH = 1280;
+    public static final int SCREEN_HEIGHT = 900;
     static final int DELAY = 20;
     boolean running = false;
     Timer timer;
+    Timer spawnTimer;
     Random random;
     InputHandler input;
     MouseHandler mouse;
@@ -72,17 +74,27 @@ public class GamePanel extends JPanel implements ActionListener {
 
         }
 
-        gel = new Gel(1, random.nextInt(SCREEN_WIDTH-20)+10, random.nextInt(SCREEN_HEIGHT-20)+10);
-        Mask mask = new Mask(1, random.nextInt(SCREEN_WIDTH-20)+10, random.nextInt(SCREEN_HEIGHT-20)+10);
-        Vaccine vaccine = new Vaccine(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10);
+        //gel = new Gel(1, random.nextInt(SCREEN_WIDTH-20)+10, random.nextInt(SCREEN_HEIGHT-20)+10);
+        //Mask mask = new Mask(1, random.nextInt(SCREEN_WIDTH-20)+10, random.nextInt(SCREEN_HEIGHT-20)+10);
+        //Vaccine vaccine = new Vaccine(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10);
 
-        itemsOnScreen.add(gel);
-        itemsOnScreen.add(mask);
-        itemsOnScreen.add(vaccine);
+        //itemsOnScreen.add(gel);
+        //itemsOnScreen.add(mask);
+        //itemsOnScreen.add(vaccine);
 
         running = true;
+        //spawnTimer = new Timer();
+
         timer = new Timer(DELAY, this);
         timer.start();
+
+        java.util.Timer t = new java.util.Timer();
+        t.schedule(new Spawn("Virus", this), 0, 5000);
+
+        enemySpawner.start();
+        gelSpawner.start();
+        maskSpawner.start();
+        vaccineSpawner.start();
     }
 
     public void checkCollision(){
@@ -140,15 +152,15 @@ public class GamePanel extends JPanel implements ActionListener {
 
                     if(item.getClass().toString().equals("class Gel")){
                         Inventory.items[0].upCurrentCount(5);
-                        itemsOnScreen.add(new Gel(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
+                        //itemsOnScreen.add(new Gel(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
 
                     }else if(item.getClass().toString().equals("class Mask")){
                         Inventory.items[1].upCurrentCount(1);
-                        itemsOnScreen.add(new Mask(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
+                        //itemsOnScreen.add(new Mask(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
 
                     }else if(item.getClass().toString().equals("class Vaccine")){
                         Inventory.items[2].upCurrentCount(1);
-                        itemsOnScreen.add(new Vaccine(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
+                        //itemsOnScreen.add(new Vaccine(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
 
                     }
                     itemsOnScreen.remove(item);
@@ -225,12 +237,110 @@ public class GamePanel extends JPanel implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
 
+
         if(running){
             player.movePlayer();
         }
+
+        //spawnTimer.schedule(new Spawn("Virus", this));
+
+
         checkCollision();
         checkItem();
         checkBulletCollision();
         repaint();
     }
+
+    Thread enemySpawner = new Thread(new Runnable() {
+        int nSpawns = 1;
+        public void run() {
+            while(true) {
+
+                if(nSpawns%2==0){
+                    System.out.println("BLOCK");
+                    for(int i=0; i<3; i++){
+
+                        try {
+                            virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), random.nextInt(player.getSpeed()-2)+1);
+                            virus.setPlayer(player);
+                            virusOnScreen.add(virus);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }
+
+                try {
+                    virus = new Virus(random.nextInt(100)+GamePanel.SCREEN_WIDTH, random.nextInt(100)+GamePanel.SCREEN_HEIGHT, random.nextInt(player.getSpeed()-2)+1);
+                    virus.setPlayer(player);
+                    GamePanel.virusOnScreen.add(virus);
+                    nSpawns++;
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                try {
+                    Thread.sleep(9000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
+
+    Thread gelSpawner = new Thread(new Runnable() {
+        public void run() {
+            while(true) {
+                Gel gel = new Gel(random.nextInt(SCREEN_WIDTH-100)+50, random.nextInt(SCREEN_HEIGHT-100)+50);
+
+                GamePanel.itemsOnScreen.add(gel);
+
+                try {
+                    Thread.sleep(8000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
+
+    Thread maskSpawner = new Thread(new Runnable() {
+        int nSpawns=1;
+        public void run() {
+
+            while(true) {
+                if(nSpawns%2==0){
+
+                }
+
+                Mask mask = new Mask(random.nextInt(SCREEN_WIDTH-100)+50, random.nextInt(SCREEN_HEIGHT-100)+50);
+
+                GamePanel.itemsOnScreen.add(mask);
+                nSpawns++;
+                try {
+                    Thread.sleep(18000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
+
+    Thread vaccineSpawner = new Thread(new Runnable() {
+        public void run() {
+            while(true) {
+                Vaccine vaccine = new Vaccine(random.nextInt(SCREEN_WIDTH-100)+50, random.nextInt(SCREEN_HEIGHT-100)+50);
+
+                GamePanel.itemsOnScreen.add(vaccine);
+
+                try {
+                    Thread.sleep(45000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
+
 }

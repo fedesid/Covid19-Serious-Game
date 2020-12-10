@@ -10,15 +10,25 @@ public class Player extends Entity {
     String name;
     int playerSize;
     Inventory inv;
+    InputHandler input;
     int xpos;
     int ypos;
     int speed;
 
+    boolean maskOn = false;
+
     static BufferedImage sprite;
+    static BufferedImage mask;
+    static BufferedImage hand;
+    static BufferedImage gel, vaccine;
 
     static {
         try {
-            sprite = ImageIO.read(new File("src/Sprites/Country/italy.png"));
+            sprite = ImageIO.read(new File("src/Sprites/Country/usa.png"));
+            mask = ImageIO.read(new File("src/Sprites/Entities/maskOn.png"));
+            hand = ImageIO.read(new File("src/Sprites/Entities/hand2.png"));
+            gel = ImageIO.read(new File("src/Sprites/Entities/gel.png"));
+            vaccine = ImageIO.read(new File("src/Sprites/Entities/vaccine.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -26,7 +36,6 @@ public class Player extends Entity {
 
     char direction;
     Color col;
-    InputHandler input;
 
     public Player(String name, int xpos, int ypos, int size, int speed, Color col, InputHandler input) throws IOException {
         this.name = name;
@@ -36,6 +45,14 @@ public class Player extends Entity {
         this.col = col;
         this.input = input;
         this.speed = speed;
+    }
+
+    public void linkInput(InputHandler input){
+        this.input = input;
+    }
+
+    public void linkInventory(Inventory inv){
+        this.inv = inv;
     }
 
     //displacement x, displacement y
@@ -79,6 +96,10 @@ public class Player extends Entity {
         this.ypos = ypos;
     }
 
+    public void wearMask(boolean bl){
+        this.maskOn = bl;
+    }
+
     @Override
     public void paintComponent(Graphics g) {
 
@@ -88,6 +109,24 @@ public class Player extends Entity {
     public void draw(Graphics g) {
 
         g.drawImage(sprite, xpos, ypos, playerSize, playerSize, null);
+
+        if(maskOn){
+
+            g.drawImage(mask, xpos, ypos+10, playerSize, playerSize, null);
+
+        }
+
+        g.drawImage(hand, xpos-10, ypos+20, playerSize, playerSize, null);
+
+        if(input.one.isPressed() && Inventory.items[0].compareTo(0) > 0){
+            g.drawImage(gel, xpos+5, ypos+20, playerSize/2, playerSize/2, null);
+
+        }else if(input.two.isPressed() && Inventory.items[1].compareTo(0) > 0){
+            g.drawImage(mask, xpos+5, ypos+20, playerSize/2, playerSize/2, null);
+
+        }else if(input.three.isPressed() && Inventory.items[2].compareTo(0) > 0){
+            g.drawImage(vaccine, xpos+5, ypos+20, playerSize/2, playerSize/2, null);
+        }
 
 /*
         g.setColor(new Color(0));

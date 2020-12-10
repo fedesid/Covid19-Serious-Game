@@ -22,9 +22,11 @@ public class Bullet extends Entity {
     double xt;
     double yt;
 
+    int damage = 25;
+
     int size = 20;
 
-    int speed=10;
+    int speed = 1;
 
     public Bullet(int xBegin, int yBegin, int xEnd, int yEnd){
         this.xPos = xBegin - size;
@@ -39,8 +41,8 @@ public class Bullet extends Entity {
 
     public void move(){
 
-        xPos += (int) ((xt)*(speed));
-        yPos += (int) ((yt)*(speed));
+        xPos += (int) ((xt/5)*(speed));
+        yPos += (int) ((yt/5)*(speed));
 
     }
 
@@ -54,6 +56,30 @@ public class Bullet extends Entity {
         }
         return false;
 
+    }
+
+    public boolean collision(Virus virus){
+        double distance = GamePanel.calcDistance(this.getXpos() + (this.getSize() /2), this.getYpos() + (this.getSize() /2), virus.getXpos() + (virus.getSize()/2), virus.getYpos() + (virus.getSize()/2));
+        if( distance <= this.getSize() /2 + virus.getSize()/4){
+            return true;
+        }
+        return false;
+    }
+
+    public int getXpos() {
+        return xPos;
+    }
+
+    public int getYpos() {
+        return yPos;
+    }
+
+    public int getSize() {
+        return size;
+    }
+
+    public int getDamage() {
+        return damage;
     }
 
     @Override

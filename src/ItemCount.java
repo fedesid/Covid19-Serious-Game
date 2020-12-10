@@ -8,8 +8,8 @@ public class ItemCount implements Comparable {
         this.currentQuantity = 0;
     }
 
-    public void upCurrentCount(){
-        this.currentQuantity++;
+    public void upCurrentCount(int quantity){
+        this.currentQuantity+=quantity;
     }
 
     public void downCurrentCount(){

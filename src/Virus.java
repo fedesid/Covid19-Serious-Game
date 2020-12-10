@@ -4,29 +4,35 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 
 public class Virus extends Entity {
 
     Player player;
-    int size;
     double distance;
     int speed;
+    int range;
+    int initHealth;
+    int currentHealth;
 
-    static BufferedImage sprite;
+    static BufferedImage sprite, sprite2;
 
     static {
         try {
             sprite = ImageIO.read(new File("src/Sprites/Entities/virus.png"));
+            sprite2 = ImageIO.read(new File("src/Sprites/Entities/stink2.png"));
         } catch (IOException e) {
             System.out.println("ERROR");
             e.printStackTrace();
         }
     }
 
-    public Virus(int xpos, int ypos, int size, int speed) throws IOException {
+    public Virus(int xpos, int ypos, int speed) throws IOException {
         super(xpos, ypos);
-        this.size=size;
         this.speed=speed;
+        setSize();
+        setRange();
+        setHealth();
     }
 
     public void setPlayer(Player player){
@@ -53,6 +59,32 @@ public class Virus extends Entity {
 
     }
 
+    public void setSize(){
+        this.size = -this.speed*20 + 170;
+    }
+
+    public void setRange() {
+        this.range = (size/speed)+size;
+    }
+
+    public void setHealth(){
+        this.initHealth = this.range/2;
+        this.currentHealth = this.initHealth;
+    }
+
+    public void takeDamage(int damage, Iterator<Virus> it){
+        this.currentHealth -= damage;
+
+        if(this.currentHealth <= 0){
+            it.remove();
+        }
+/*
+        if(this.currentHealth <= 0){
+            GamePanel.virusOnScreen.remove(this);
+        }
+        */
+    }
+
     @Override
     public void paintComponent(Graphics g) {
 
@@ -61,8 +93,21 @@ public class Virus extends Entity {
     @Override
     public void draw(Graphics g) {
 
-
+        g.drawImage(sprite2, xpos-size/(2*speed),ypos-size/(2*speed),range,range, null);
+        //g.setColor(new Color(0x17000000, true));
+        //g.fillOval(xpos-size/(2*speed),ypos-size/(2*speed),range,range);
+        //g.setColor(new Color(0xFF0000));
+        //g.drawOval(xpos-size/(2*speed),ypos-size/(2*speed),range,range);
         g.drawImage(sprite, xpos, ypos, size, size, null);
+
+        if(this.currentHealth != initHealth){
+            g.setColor(Color.red);
+            g.fillRect(xpos, ypos, this.initHealth, 5);
+
+            g.setColor(Color.green);
+            g.fillRect(xpos, ypos, this.currentHealth, 5);
+        }
+
 
         /*
         g.setColor(new Color(0x17000000, true));

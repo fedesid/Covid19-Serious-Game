@@ -1,5 +1,6 @@
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.Iterator;
 
 public class MouseHandler implements MouseListener {
     GamePanel gp;
@@ -31,14 +32,21 @@ public class MouseHandler implements MouseListener {
                 Inventory.items[0].downCurrentCount();
                 xcoo = mouseEvent.getX();
                 ycoo = mouseEvent.getY();
+                System.out.println(xcoo + " " + ycoo);
 
                 Bullet bullet = new Bullet(gp.player.getXpos()+gp.player.getPlayerSize()/2, gp.player.getYpos()+gp.player.getPlayerSize()/2, xcoo, ycoo);
                 GamePanel.bulletsOnScreen.add(bullet);
-                System.out.println(xcoo + " " + ycoo);
+
             }
         }
 
         if(input.two.isPressed()){ // Mask
+
+            if(Inventory.items[1].compareTo(0) > 0){
+                gp.player.wearMask(true);
+                Inventory.items[1].downCurrentCount();
+            }
+
 
         }
 
@@ -46,7 +54,12 @@ public class MouseHandler implements MouseListener {
             if (Inventory.items[2].compareTo(0) > 0){
 
                 Inventory.items[2].downCurrentCount();
-                GamePanel.virusOnScreen.clear();
+
+                for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext(); ){
+                    Virus virus = virusIterator.next();
+                    virus.takeDamage(75, virusIterator);
+
+                }
             }
         }
 

@@ -1,14 +1,17 @@
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.Timer;
 import java.awt.*;
 import java.awt.event.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
+import java.util.*;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-    public static final int SCREEN_WIDTH = 900;
-    public static final int SCREEN_HEIGHT = 600;
+    public static final int SCREEN_WIDTH = 1150;
+    public static final int SCREEN_HEIGHT = 720;
     static final int DELAY = 20;
     boolean running = false;
     Timer timer;
@@ -30,6 +33,16 @@ public class GamePanel extends JPanel implements ActionListener {
     Gel gel;
     Virus virus;
 
+    static BufferedImage bg;
+
+    static {
+        try {
+            bg = ImageIO.read(new File("src/Sprites/Background/bg.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public GamePanel() throws IOException {
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(new Color(0x008C1C));
@@ -49,9 +62,11 @@ public class GamePanel extends JPanel implements ActionListener {
         random = new Random();
 
         player = new Player("F", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,7, Color.red, input);
+        player.linkInput(input);
+        player.linkInventory(inventory);
 
         for(int i=0; i<5; i++){
-            Virus virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), 100, random.nextInt(player.getSpeed()-2)+1);
+            Virus virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), random.nextInt(player.getSpeed()-2)+1);
             virus.setPlayer(player);
             virusOnScreen.add(virus);
 
@@ -99,11 +114,11 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public static double calcAngleSin(int x1, int y1, int x2, int y2){
         double hyp = calcDistance(x1, y1, x2, y2);
-        return Math.asin( (y1-y2)/hyp );
+        return Math.toDegrees( Math.asin( (y1-y2)/hyp ) ) ;
     }
     public static double calcAngleCos(int x1, int y1, int x2, int y2){
         double hyp = calcDistance(x1, y1, x2, y2);
-        return Math.acos( (x1-x2)/hyp )-Math.PI/2;
+        return Math.toDegrees( Math.acos( (x1-x2)/hyp )-Math.PI/2 ) ;
     }
 
     public static double calcDistance(int x1, int y1, int x2, int y2){
@@ -124,15 +139,15 @@ public class GamePanel extends JPanel implements ActionListener {
                     //TODO change the way the inventory works. Use classes instead of indexes i.e. Class mask, class gel, class vaccine
 
                     if(item.getClass().toString().equals("class Gel")){
-                        Inventory.items[0].upCurrentCount();
+                        Inventory.items[0].upCurrentCount(5);
                         itemsOnScreen.add(new Gel(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
 
                     }else if(item.getClass().toString().equals("class Mask")){
-                        Inventory.items[1].upCurrentCount();
+                        Inventory.items[1].upCurrentCount(1);
                         itemsOnScreen.add(new Mask(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
 
                     }else if(item.getClass().toString().equals("class Vaccine")){
-                        Inventory.items[2].upCurrentCount();
+                        Inventory.items[2].upCurrentCount(1);
                         itemsOnScreen.add(new Vaccine(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
 
                     }
@@ -146,16 +161,52 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+    public void checkBulletCollision(){
+
+        // list that contains all the bullets that did collide with a virus,
+        // I keep track of this so that I will be able to remove them from the list of bullets that did not hit
+        Collection<Bullet> tempBullet = new ArrayList<>();
+
+
+        for(Iterator<Bullet> bulletIterator = GamePanel.bulletsOnScreen.iterator(); bulletIterator.hasNext();){
+            Bullet bullet = bulletIterator.next();
+
+            for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext(); ){
+                Virus virus = virusIterator.next();
+
+                if(bullet.collision(virus)){
+
+                    virus.takeDamage(bullet.getDamage(), virusIterator);
+
+                    tempBullet.add(bullet);
+
+                }
+
+            }
+
+        }
+
+        bulletsOnScreen.removeAll(tempBullet);
+
+    }
+
     public void paintComponent(Graphics g){
         super.paintComponent(g);
+        g.drawImage(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
         draw(g);
 
     }
 
     public void draw(Graphics g){
-        player.draw(g);
-        inventory.draw(g);
 
+        for(Virus virus : virusOnScreen){
+            virus.chase();
+            virus.draw(g);
+        }
+
+        for(Item item : itemsOnScreen){
+            item.draw(g);
+        }
         for(Bullet bullet : bulletsOnScreen){
             bullet.move();
             bullet.draw(g);
@@ -166,27 +217,20 @@ public class GamePanel extends JPanel implements ActionListener {
             }
         }
 
-        for(Virus virus : virusOnScreen){
-            virus.chase();
-            virus.draw(g);
-        }
-
-        for(Item item : itemsOnScreen){
-            item.draw(g);
-        }
+        player.draw(g);
+        inventory.draw(g);
 
     }
-
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
 
         if(running){
             player.movePlayer();
-
         }
         checkCollision();
         checkItem();
+        checkBulletCollision();
         repaint();
     }
 }

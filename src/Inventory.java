@@ -39,7 +39,7 @@ public class Inventory {
 
     public void draw(Graphics g) {
 
-        g.setColor(Color.black);
+        g.setColor(Color.white);
 
         g.drawRect(xpos, ypos , width, height);
 

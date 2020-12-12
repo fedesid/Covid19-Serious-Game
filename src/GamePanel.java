@@ -11,8 +11,8 @@ import java.util.*;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-    public static final int SCREEN_WIDTH = 1280;
-    public static final int SCREEN_HEIGHT = 900;
+    public static final int SCREEN_WIDTH = 1200;
+    public static final int SCREEN_HEIGHT = 800;
     static final int DELAY = 20;
     boolean running = false;
     Timer timer;
@@ -71,6 +71,7 @@ public class GamePanel extends JPanel implements ActionListener {
             Virus virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), random.nextInt(player.getSpeed()-2)+1);
             virus.setPlayer(player);
             virusOnScreen.add(virus);
+            Virus.totalNumberOfViruses++;
 
         }
 
@@ -173,6 +174,29 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+    public void checkVirus(){
+
+        if(virusOnScreen.size() != 0){
+            int c=0;
+            for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext();){
+                Virus virus = virusIterator.next();
+
+                if( virus.collision(player) ){
+                    c++;
+                }
+
+            }
+
+            if(c!=0){
+                Virus.isInContact = true;
+            }else {
+                Virus.isInContact = false;
+            }
+
+        }
+
+    }
+
     public void checkBulletCollision(){
 
         // list that contains all the bullets that did collide with a virus,
@@ -230,6 +254,12 @@ public class GamePanel extends JPanel implements ActionListener {
         }
 
         player.draw(g);
+
+        if(Virus.isInContact && !player.maskOn){ // Show the user that they are taking damage
+            g.setColor(new Color(0x28FF0000, true));
+            g.fillRect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT);
+        }
+
         inventory.draw(g);
 
     }
@@ -247,6 +277,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
         checkCollision();
         checkItem();
+        checkVirus();
         checkBulletCollision();
         repaint();
     }
@@ -256,27 +287,28 @@ public class GamePanel extends JPanel implements ActionListener {
         public void run() {
             while(true) {
 
-                if(nSpawns%2==0){
-                    System.out.println("BLOCK");
-                    for(int i=0; i<3; i++){
+                try{
 
-                        try {
-                            virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), random.nextInt(player.getSpeed()-2)+1);
-                            virus.setPlayer(player);
-                            virusOnScreen.add(virus);
-                        } catch (IOException e) {
-                            e.printStackTrace();
+                    if(nSpawns%2==0){
+                        System.out.println("BLOCK");
+                        for(int i=0; i<3; i++){
+                                virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), random.nextInt(player.getSpeed()-2)+1);
+                                virus.setPlayer(player);
+                                virusOnScreen.add(virus);
+                                Virus.totalNumberOfViruses++;
                         }
 
-                    }
-                }
+                    }else {
 
-                try {
-                    virus = new Virus(random.nextInt(100)+GamePanel.SCREEN_WIDTH, random.nextInt(100)+GamePanel.SCREEN_HEIGHT, random.nextInt(player.getSpeed()-2)+1);
-                    virus.setPlayer(player);
-                    GamePanel.virusOnScreen.add(virus);
-                    nSpawns++;
-                } catch (IOException e) {
+                        virus = new Virus(random.nextInt(100)+GamePanel.SCREEN_WIDTH, random.nextInt(100)+GamePanel.SCREEN_HEIGHT, random.nextInt(player.getSpeed()-2)+1);
+                        virus.setPlayer(player);
+                        GamePanel.virusOnScreen.add(virus);
+                        nSpawns++;
+                        Virus.totalNumberOfViruses++;
+
+                    }
+
+                }catch (IOException e){
                     e.printStackTrace();
                 }
 
@@ -310,9 +342,6 @@ public class GamePanel extends JPanel implements ActionListener {
         public void run() {
 
             while(true) {
-                if(nSpawns%2==0){
-
-                }
 
                 Mask mask = new Mask(random.nextInt(SCREEN_WIDTH-100)+50, random.nextInt(SCREEN_HEIGHT-100)+50);
 

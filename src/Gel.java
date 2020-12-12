@@ -6,6 +6,8 @@ import java.io.IOException;
 
 public class Gel extends Item {
 
+    static int totalNumberOfGelUsed = 0;
+
     static BufferedImage sprite;
 
     static {
@@ -29,7 +31,7 @@ public class Gel extends Item {
     @Override
     public void draw(Graphics g) {
 
-        g.drawImage(sprite, itemXpos, itemYpos, (int) (SIZE/1.5), SIZE, null);
+        g.drawImage(sprite, xpos, ypos, (int) (SIZE/1.5), SIZE, null);
         /*
         g.setColor(new Color(0x6EFFFF));
         g.fillRect(itemXpos, itemYpos, size, size);

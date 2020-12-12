@@ -1,4 +1,3 @@
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -8,12 +7,25 @@ import java.util.Iterator;
 
 public class Virus extends Entity {
 
+    static int totalNumberOfViruses = 0;
+    static int totalNumberOfVirusesKilled = 0;
+    static int totalNumberOfContacts = 0;
+
     Player player;
     double distance;
+
+    boolean contact = false;
+    boolean prevContact = false;
+
+    static boolean isInContact = false;
+
     int speed;
     int range;
     int initHealth;
     int currentHealth;
+    int damage;
+
+    int cc = 0;
 
     static BufferedImage sprite, sprite2;
 
@@ -33,6 +45,7 @@ public class Virus extends Entity {
         setSize();
         setRange();
         setHealth();
+        setDamage();
     }
 
     public void setPlayer(Player player){
@@ -59,6 +72,28 @@ public class Virus extends Entity {
 
     }
 
+    public boolean collision(Player player){
+        double distance = GamePanel.calcDistance(player.getXpos() + (player.getPlayerSize() /2), player.getYpos() + (player.getPlayerSize() /2), this.getXpos() + (this.getSize()/2), this.getYpos() + (this.getSize()/2));
+        if( distance <= player.getPlayerSize() /2 + this.getRange()/2){
+            this.setContact(true);
+            upCollisions();
+            return true;
+        }
+        this.setContact(false);
+        return false;
+    }
+
+    public void upCollisions(){
+
+        if(!prevContact && contact){
+            if(!player.maskOn){
+                totalNumberOfContacts++;
+
+            }
+        }
+
+    }
+
     public void setSize(){
         this.size = -this.speed*20 + 170;
     }
@@ -72,10 +107,29 @@ public class Virus extends Entity {
         this.currentHealth = this.initHealth;
     }
 
+    public void setDamage(){
+        this.damage = this.size*100;
+    }
+
+    public int getRange() {
+        return range;
+    }
+
+    public void setContact(boolean contact) {
+
+        this.prevContact = this.contact;
+        this.contact = contact;
+    }
+
+    public boolean isContact() {
+        return contact;
+    }
+
     public void takeDamage(int damage, Iterator<Virus> it){
         this.currentHealth -= damage;
 
         if(this.currentHealth <= 0){
+            Virus.totalNumberOfVirusesKilled++;
             it.remove();
         }
 /*
@@ -92,6 +146,10 @@ public class Virus extends Entity {
 
     @Override
     public void draw(Graphics g) {
+
+        g.drawString( String.valueOf(totalNumberOfViruses), 50, 50 );
+        g.drawString( String.valueOf(totalNumberOfVirusesKilled), 50, 60 );
+        g.drawString( String.valueOf(totalNumberOfContacts), 50, 70 );
 
         g.drawImage(sprite2, xpos-size/(2*speed),ypos-size/(2*speed),range,range, null);
         //g.setColor(new Color(0x17000000, true));

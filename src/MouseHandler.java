@@ -29,6 +29,7 @@ public class MouseHandler implements MouseListener {
         if(input.one.isPressed()){ // Gel
             if (Inventory.items[0].compareTo(0) > 0){
 
+                Gel.totalNumberOfGelUsed++;
                 Inventory.items[0].downCurrentCount();
                 xcoo = mouseEvent.getX();
                 ycoo = mouseEvent.getY();
@@ -43,6 +44,8 @@ public class MouseHandler implements MouseListener {
         if(input.two.isPressed()){ // Mask
 
             if(Inventory.items[1].compareTo(0) > 0){
+
+                Mask.totalNumberOfMaskUsed++;
                 gp.player.wearMask(true);
                 Inventory.items[1].downCurrentCount();
             }
@@ -52,6 +55,7 @@ public class MouseHandler implements MouseListener {
 
         if(input.three.isPressed()){ // Vaccine
             if (Inventory.items[2].compareTo(0) > 0){
+                Vaccine.totalNumberOfVaccineUsed++;
 
                 Inventory.items[2].downCurrentCount();
 

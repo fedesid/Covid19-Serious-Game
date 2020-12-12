@@ -6,6 +6,8 @@ import java.io.IOException;
 
 public class Vaccine extends Item {
 
+    static int totalNumberOfVaccineUsed;
+
     static BufferedImage sprite;
     static {
         try {
@@ -29,7 +31,7 @@ public class Vaccine extends Item {
 
     @Override
     public void draw(Graphics g) {
-        g.drawImage(sprite, itemXpos, itemYpos, size, size, null);
+        g.drawImage(sprite, xpos, ypos, size, size, null);
     }
 
 }

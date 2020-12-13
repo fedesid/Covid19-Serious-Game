@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
 
+// TODO virus that sneezes at you and does not move. it can spawn near the sides of the map
+// TODO vaccine deals "splash" damage. the closer the virus the higher the damage. further the virus is the less damage it takes (close to nothing)
+
 public class Virus extends Entity {
 
     static int totalNumberOfViruses = 0;
@@ -147,6 +150,7 @@ public class Virus extends Entity {
     @Override
     public void draw(Graphics g) {
 
+        g.setColor(Color.green);
         g.drawString( String.valueOf(totalNumberOfViruses), 50, 50 );
         g.drawString( String.valueOf(totalNumberOfVirusesKilled), 50, 60 );
         g.drawString( String.valueOf(totalNumberOfContacts), 50, 70 );

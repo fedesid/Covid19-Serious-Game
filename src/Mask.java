@@ -7,6 +7,7 @@ import java.io.IOException;
 public class Mask extends Item {
 
     static int totalNumberOfMaskUsed = 0;
+    static int maskDuration = 5;
 
     static BufferedImage sprite;
     static {
@@ -31,6 +32,7 @@ public class Mask extends Item {
 
     @Override
     public void draw(Graphics g) {
+
         g.drawImage(sprite, xpos, ypos, size, size, null);
     }
 }

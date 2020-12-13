@@ -1,5 +1,4 @@
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.util.Iterator;
 
 public class MouseHandler implements MouseListener {
@@ -8,8 +7,11 @@ public class MouseHandler implements MouseListener {
 
     int xcoo;
     int ycoo;
+    static long startTime = System.currentTimeMillis();
+
 
     public MouseHandler(GamePanel gp){
+        maskTime.start();
         this.gp = gp;
         gp.addMouseListener(this);
     }
@@ -33,8 +35,8 @@ public class MouseHandler implements MouseListener {
                 Inventory.items[0].downCurrentCount();
                 xcoo = mouseEvent.getX();
                 ycoo = mouseEvent.getY();
-                System.out.println(xcoo + " " + ycoo);
-
+                System.out.println("AIM COO: " + xcoo + " " + ycoo);
+                System.out.println("PLAYER: " + gp.player.getXpos() + " " + gp.player.getYpos());
                 Bullet bullet = new Bullet(gp.player.getXpos()+gp.player.getPlayerSize()/2, gp.player.getYpos()+gp.player.getPlayerSize()/2, xcoo, ycoo);
                 GamePanel.bulletsOnScreen.add(bullet);
 
@@ -43,13 +45,18 @@ public class MouseHandler implements MouseListener {
 
         if(input.two.isPressed()){ // Mask
 
-            if(Inventory.items[1].compareTo(0) > 0){
+            if(gp.player.maskOn){
+                gp.player.wearMask(false);
+            }else if(Inventory.items[1].compareTo(0) > 0){
+
+                startTime = System.currentTimeMillis();
 
                 Mask.totalNumberOfMaskUsed++;
                 gp.player.wearMask(true);
                 Inventory.items[1].downCurrentCount();
-            }
 
+
+            }
 
         }
 
@@ -61,13 +68,21 @@ public class MouseHandler implements MouseListener {
 
                 for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext(); ){
                     Virus virus = virusIterator.next();
-                    virus.takeDamage(75, virusIterator);
+
+                    double distance = GamePanel.calcDistance(gp.player.getXpos()+gp.player.getPlayerSize()/2, gp.player.getYpos()+gp.player.getPlayerSize()/2, virus.getXpos()+virus.getSize()/2, virus.getYpos()+virus.getSize()/2);
+
+                    // two different formulas for calculating the damage of the vaccine, still have to decide which way to go
+                    //int damage = (int) (-Math.pow( (float) distance/100, 2 )+virus.initHealth*1.1);
+                    int damage = (int) ( (15000)/(distance+125) );
+                    if(damage<0){
+                        damage=0;
+                    }
+                    System.out.println(damage);
+                    virus.takeDamage((int) (damage), virusIterator);
 
                 }
             }
         }
-
-
 
     }
 
@@ -83,6 +98,82 @@ public class MouseHandler implements MouseListener {
 
     @Override
     public void mouseExited(MouseEvent mouseEvent) {
+
+    }
+
+
+
+    Thread maskTime = new Thread(new Runnable() {
+
+        public void run() {
+
+            while(true) {
+
+                if( Math.abs(startTime - System.currentTimeMillis())/1000 > Mask.maskDuration ){
+                    gp.player.wearMask(false);
+                }
+
+
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+    });
+}
+
+class MouseWheelHandler implements MouseWheelListener {
+
+    InputHandler input;
+
+    public MouseWheelHandler(GamePanel gp){
+        gp.addMouseWheelListener(this);
+    }
+
+    public void linkInput(InputHandler input){
+        this.input = input;
+    }
+
+
+    @Override
+    public void mouseWheelMoved(MouseWheelEvent mouseWheelEvent) {
+
+        if(mouseWheelEvent.getWheelRotation() < 0){
+            System.out.println("UP");
+            System.out.println("DOWN");
+
+            if(input.one.isPressed()){
+                input.one.toggle(false);
+                input.three.toggle(true);
+            }else if(input.two.isPressed()){
+                input.two.toggle(false);
+                input.one.toggle(true);
+            }else if(input.three.isPressed()){
+                input.three.toggle(false);
+                input.two.toggle(true);
+            }else{
+                input.one.toggle(true);
+            }
+
+        }else{
+
+
+            if(input.one.isPressed()){
+                input.one.toggle(false);
+                input.two.toggle(true);
+            }else if(input.two.isPressed()){
+                input.two.toggle(false);
+                input.three.toggle(true);
+            }else if(input.three.isPressed()){
+                input.three.toggle(false);
+                input.one.toggle(true);
+            }else{
+                input.three.toggle(true);
+            }
+        }
+
 
     }
 }

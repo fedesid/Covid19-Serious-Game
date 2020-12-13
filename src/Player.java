@@ -1,3 +1,6 @@
+import javafx.animation.FillTransition;
+import javafx.util.Duration;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -107,6 +110,13 @@ public class Player extends Entity {
 
     @Override
     public void draw(Graphics g) {
+
+        if(maskOn){
+
+            g.setColor(new Color(0x3EFFFFFF, true));
+            g.fillRect(0,0, GamePanel.SCREEN_WIDTH, GamePanel.SCREEN_HEIGHT);
+
+        }
 
         g.drawImage(sprite, xpos, ypos, playerSize, playerSize, null);
 

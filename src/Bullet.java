@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+import static java.lang.Math.atan2;
+
 public class Bullet extends Entity {
     static BufferedImage sprite;
     static {
@@ -17,25 +19,41 @@ public class Bullet extends Entity {
     int xPos;
     int yPos;
     int yBegin;
+    int xBegin;
     int xEnd;
     int yEnd;
     double xt;
     double yt;
 
+    int direction;
+    double slope;
+    double angle;
+
     int damage = 25;
 
     int size = 20;
 
-    int speed = 1;
+    int speed = 2;
 
     public Bullet(int xBegin, int yBegin, int xEnd, int yEnd){
-        this.xPos = xBegin - size;
-        this.yPos = yBegin - size;
+        this.xPos = xBegin - size/2;
+        this.yPos = yBegin - size/2;
+        this.xBegin = xBegin;
         this.yBegin = yBegin;
         this.xEnd = xEnd;
         this.yEnd = yEnd;
-        this.yt = -GamePanel.calcAngleSin(xPos, yPos, xEnd, yEnd);
-        this.xt = GamePanel.calcAngleCos(xPos, yPos, xEnd, yEnd);
+        this.yt = -GamePanel.calcAngleSin(xBegin, yBegin, xEnd, yEnd);
+        this.xt = GamePanel.calcAngleCos(xBegin, yBegin, xEnd, yEnd);
+        slope = GamePanel.calcSlope(xBegin, yBegin, xEnd, yEnd);
+        System.out.println("SLOPE: " + slope);
+
+        int deltaX = xEnd - xBegin;
+        int deltaY = yEnd - yBegin;
+        angle = atan2(deltaY, deltaX);
+
+        this.direction = xEnd - xBegin;
+
+        System.out.println("BULLET: " + xPos + " " + yPos);
         System.out.println(xt + " " + yt);
     }
 

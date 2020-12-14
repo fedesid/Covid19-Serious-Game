@@ -80,6 +80,8 @@ public class MouseHandler implements MouseListener {
                     System.out.println(damage);
                     virus.takeDamage((int) (damage), virusIterator);
 
+                    gp.country.healPopulation(10);
+
                 }
             }
         }

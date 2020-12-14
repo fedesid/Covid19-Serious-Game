@@ -23,16 +23,12 @@ public class ReadCountries {
 
             }
 
+            sc.close();
+
         }catch (FileNotFoundException e){
             System.out.println(e.getMessage());
         }
 
 
     }
-
-    public static void main(String[] args) {
-
-        Country c = new Country("italy");
-    }
-
 }

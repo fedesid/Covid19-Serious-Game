@@ -1,0 +1,4 @@
+Name       Country    Kills      Contacts   Alive      Infected   Dead      
+Mario      France     133        123        5345345    645645     35435     
+Fede       italy      0          14         0          59032080   1327920   
+John Cena  usa        30         105        0          301944000  26256000  

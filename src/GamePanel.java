@@ -11,27 +11,32 @@ import java.util.*;
 
 public class GamePanel extends JPanel implements ActionListener {
 
+    private enum STATE{
+        MENU,
+        GAME
+    };
+
+    private STATE state = STATE.GAME;
+
     public static final int SCREEN_WIDTH = 1200;
     public static final int SCREEN_HEIGHT = 800;
     static final int DELAY = 20;
     boolean running = false;
+
     Timer timer;
-    Timer spawnTimer;
     Random random;
     InputHandler input;
     MouseHandler mouse;
     MouseWheelHandler mouseWheel;
     Inventory inventory;
-
-    int tempX;
-    int tempY;
-    public boolean[] keyList = new boolean[4];
+    Score score;
+    Country country;
 
     boolean moving = false;
 
     static ArrayList<Bullet> bulletsOnScreen = new ArrayList<>();
     static ArrayList<Virus> virusOnScreen = new ArrayList<>();
-    static ArrayList<Item> itemsOnScreen = new ArrayList<Item>();
+    static ArrayList<Item> itemsOnScreen = new ArrayList<>();
     Player player;
     Gel gel;
     Virus virus;
@@ -55,11 +60,14 @@ public class GamePanel extends JPanel implements ActionListener {
     }
 
     public void startGame() throws IOException {
+        ReadScore rs = new ReadScore("src/score.txt");
 
         inventory = new Inventory(this);
         input = new InputHandler(this);
         mouse = new MouseHandler(this);
         mouseWheel = new MouseWheelHandler(this);
+        country = new Country("usa");
+        country.linkGamePanel(this);
 
 
         inventory.linkInput(input);
@@ -67,9 +75,10 @@ public class GamePanel extends JPanel implements ActionListener {
         mouseWheel.linkInput(input);
         random = new Random();
 
-        player = new Player("F", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,7, Color.red, input);
+        player = new Player("John Cena", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,7, Color.red, input);
         player.linkInput(input);
         player.linkInventory(inventory);
+        player.linkCountry(country);
 
         for(int i=0; i<5; i++){
             Virus virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), random.nextInt(player.getSpeed()-2)+1);
@@ -99,6 +108,19 @@ public class GamePanel extends JPanel implements ActionListener {
         gelSpawner.start();
         maskSpawner.start();
         vaccineSpawner.start();
+        country.causeDeaths.start();
+        country.causeInfections.start();
+    }
+
+    public void endGame(){
+
+        timer.stop();
+
+        ReadScore.scores.add(new Score(player.name, player.country.country, Virus.totalNumberOfVirusesKilled, Virus.totalNumberOfContacts, country.getHealthyPopulation(), country.getInfectedPopulation(), country.getDeadPopulation()));
+
+        WriteScore wr = new WriteScore("src/score.txt");
+        System.exit(-1);
+
     }
 
     public void checkCollision(){
@@ -186,26 +208,32 @@ public class GamePanel extends JPanel implements ActionListener {
 
         try{
 
-            if(virusOnScreen.size() != 0){
-                int c=0;
-                for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext();){
-                    Virus virus = virusIterator.next();
+            if(!player.maskOn){
+                if(virusOnScreen.size() != 0){
+                    int c=0;
+                    for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext();){
+                        Virus virus = virusIterator.next();
 
-                    if( virus.collision(player) ){
-                        c++;
+                        if( virus.collision(player) ){ // collision check
+                            // Virus has collided with player
+                            country.takeDamage(virus.getDamage());
+
+                            c++;
+                        }
+
                     }
 
-                }
+                    if(c!=0){
+                        Virus.isInContact = true;
+                    }else {
+                        Virus.isInContact = false;
+                    }
 
-                if(c!=0){
-                    Virus.isInContact = true;
-                }else {
+                }else{
                     Virus.isInContact = false;
                 }
-
-            }else{
-                Virus.isInContact = false;
             }
+
 
         }catch (ConcurrentModificationException ignored){
 
@@ -219,26 +247,31 @@ public class GamePanel extends JPanel implements ActionListener {
         // I keep track of this so that I will be able to remove them from the list of bullets that did not hit
         Collection<Bullet> tempBullet = new ArrayList<>();
 
+        try{
+            for(Iterator<Bullet> bulletIterator = GamePanel.bulletsOnScreen.iterator(); bulletIterator.hasNext();){
+                Bullet bullet = bulletIterator.next();
 
-        for(Iterator<Bullet> bulletIterator = GamePanel.bulletsOnScreen.iterator(); bulletIterator.hasNext();){
-            Bullet bullet = bulletIterator.next();
+                for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext(); ){
+                    Virus virus = virusIterator.next();
 
-            for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext(); ){
-                Virus virus = virusIterator.next();
+                    if(bullet.collision(virus)){
 
-                if(bullet.collision(virus)){
+                        virus.takeDamage(bullet.getDamage(), virusIterator);
 
-                    virus.takeDamage(bullet.getDamage(), virusIterator);
+                        tempBullet.add(bullet);
 
-                    tempBullet.add(bullet);
+                    }
 
                 }
 
             }
 
+            bulletsOnScreen.removeAll(tempBullet);
+        }catch (ConcurrentModificationException ignored){
+
         }
 
-        bulletsOnScreen.removeAll(tempBullet);
+
 
     }
 
@@ -251,68 +284,70 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void draw(Graphics g){
 
+        if(state == STATE.GAME){
+            int virusSize = GamePanel.virusOnScreen.size(); // control variable
+            // I was getting an error which I think it was caused when a new virus was created and added to the list while the program was inside this loop
+            // The error was ConcurrentModificationException
+            // I could enclose this part of the code with a try and catch block
 
-        int virusSize = GamePanel.virusOnScreen.size(); // control variable
-        // I was getting an error which I think it was caused when a new virus was created and added to the list while the program was inside this loop
-        // The error was ConcurrentModificationException
-        // I could enclose this part of the code with a try and catch block
-
-        try{
-            for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext();){
+            try{
+                for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext();){
                     Virus virus = virusIterator.next();
 
                     virus.chase();
                     virus.draw(g);
-            }
-
-            for(Iterator<Item> itemIterator = GamePanel.itemsOnScreen.iterator(); itemIterator.hasNext(); ){
-                Item item = itemIterator.next();
-
-                item.draw(g);
-            }
-
-            for(Iterator<Bullet> bulletIterator = GamePanel.bulletsOnScreen.iterator(); bulletIterator.hasNext(); ){
-                Bullet bullet = bulletIterator.next();
-
-                bullet.move();
-                bullet.draw(g);
-
-                if( bullet.clear() ){ // deleting the bullets after they leave the screen
-                    GamePanel.bulletsOnScreen.remove(bullet);
-                    break;
                 }
+
+                for(Iterator<Item> itemIterator = GamePanel.itemsOnScreen.iterator(); itemIterator.hasNext(); ){
+                    Item item = itemIterator.next();
+
+                    item.draw(g);
+                }
+
+                for(Iterator<Bullet> bulletIterator = GamePanel.bulletsOnScreen.iterator(); bulletIterator.hasNext(); ){
+                    Bullet bullet = bulletIterator.next();
+
+                    bullet.move();
+                    bullet.draw(g);
+
+                    if( bullet.clear() ){ // deleting the bullets after they leave the screen
+                        GamePanel.bulletsOnScreen.remove(bullet);
+                        break;
+                    }
+                }
+            }catch (ConcurrentModificationException ignored){
+
             }
-        }catch (ConcurrentModificationException ignored){
 
+            player.draw(g);
+
+            if(Virus.isInContact && !player.maskOn){ // Show the user that they are taking damage
+                g.setColor(new Color(0x28FF0000, true));
+                g.fillRect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT);
+            }
+
+            country.draw(g);
+            inventory.draw(g);
         }
 
-        player.draw(g);
-
-        if(Virus.isInContact && !player.maskOn){ // Show the user that they are taking damage
-            g.setColor(new Color(0x28FF0000, true));
-            g.fillRect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT);
-        }
-
-        inventory.draw(g);
 
     }
 
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
 
+        if(state == STATE.GAME){
+            if(running){
+                player.movePlayer();
+            }
 
-        if(running){
-            player.movePlayer();
+            checkCollision();
+            checkItem();
+            checkVirus();
+            checkBulletCollision();
+            repaint();
         }
 
-        //spawnTimer.schedule(new Spawn("Virus", this));
-
-
-        checkCollision();
-        checkItem();
-        checkVirus();
-        checkBulletCollision();
-        repaint();
     }
 
     Thread enemySpawner = new Thread(new Runnable() {

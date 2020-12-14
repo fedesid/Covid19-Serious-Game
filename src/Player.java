@@ -1,10 +1,6 @@
-import javafx.animation.FillTransition;
-import javafx.util.Duration;
-
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.image.ImageObserver;
 import java.io.File;
 import java.io.IOException;
 
@@ -12,22 +8,23 @@ public class Player extends Entity {
 
     String name;
     int playerSize;
-    Inventory inv;
-    InputHandler input;
+
     int xpos;
     int ypos;
     int speed;
 
     boolean maskOn = false;
 
-    static BufferedImage sprite;
+    Inventory inv;
+    InputHandler input;
+    Country country;
+
     static BufferedImage mask;
     static BufferedImage hand;
     static BufferedImage gel, vaccine;
 
     static {
         try {
-            sprite = ImageIO.read(new File("src/Sprites/Country/spain.png"));
             mask = ImageIO.read(new File("src/Sprites/Entities/maskOn.png"));
             hand = ImageIO.read(new File("src/Sprites/Entities/hand2.png"));
             gel = ImageIO.read(new File("src/Sprites/Entities/gel.png"));
@@ -56,6 +53,10 @@ public class Player extends Entity {
 
     public void linkInventory(Inventory inv){
         this.inv = inv;
+    }
+
+    public void linkCountry(Country country){
+        this.country = country;
     }
 
     //displacement x, displacement y
@@ -118,7 +119,7 @@ public class Player extends Entity {
 
         }
 
-        g.drawImage(sprite, xpos, ypos, playerSize, playerSize, null);
+        g.drawImage(country.flag, xpos, ypos, playerSize, playerSize, null);
 
         if(maskOn){
 

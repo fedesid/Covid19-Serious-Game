@@ -7,16 +7,17 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.*;
 
 public class GamePanel extends JPanel implements ActionListener {
 
-    private enum STATE{
+    public enum STATE{
         MENU,
-        GAME
+        GAME,
+        LEADERBOARD,
+        END
     };
 
-    private STATE state = STATE.GAME;
+    public STATE state = STATE.MENU;
 
     public static final int SCREEN_WIDTH = 1200;
     public static final int SCREEN_HEIGHT = 800;
@@ -32,6 +33,12 @@ public class GamePanel extends JPanel implements ActionListener {
     Score score;
     Country country;
 
+    MenuGraphics menu;
+    LeaderboardGraphics leaderboard;
+    GameOverGraphics gameover;
+
+    JTextField textField;
+
     boolean moving = false;
 
     static ArrayList<Bullet> bulletsOnScreen = new ArrayList<>();
@@ -40,6 +47,9 @@ public class GamePanel extends JPanel implements ActionListener {
     Player player;
     Gel gel;
     Virus virus;
+
+    String username;
+    String usercountry;
 
     static BufferedImage bg;
 
@@ -55,27 +65,52 @@ public class GamePanel extends JPanel implements ActionListener {
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(new Color(0x008C1C));
         this.setFocusable(true);
-        this.startGame();
+
+        Scanner userInput = new Scanner(System.in);
+        System.out.println("Enter name");
+        username = userInput.nextLine();
+        System.out.println("Enter country");
+        usercountry = userInput.nextLine();
+
+        ReadScore rs = new ReadScore("src/score.txt");
+
+        mouse = new MouseHandler(this);
+        this.setBackground(Color.black);
+        menu = new MenuGraphics(this);
+        leaderboard = new LeaderboardGraphics(this);
+        gameover = new GameOverGraphics(this);
+
+        timer = new Timer(DELAY, this);
+        timer.start();
+
+        textField = new JTextField(8);
+        //textField.setBounds(5, 5, 280, 50); // to get height, set large font
+        textField.setFont(textField.getFont().deriveFont(50f));
+        this.add(textField);
+
+
+        //this.startGame();
         //this.addKeyListener(new MyKeyAdapter());
     }
 
     public void startGame() throws IOException {
-        ReadScore rs = new ReadScore("src/score.txt");
+
+        itemsOnScreen.removeAll(itemsOnScreen);
+        virusOnScreen.removeAll(virusOnScreen);
+        bulletsOnScreen.removeAll(bulletsOnScreen);
 
         inventory = new Inventory(this);
         input = new InputHandler(this);
-        mouse = new MouseHandler(this);
         mouseWheel = new MouseWheelHandler(this);
-        country = new Country("usa");
+        country = new Country(usercountry);
         country.linkGamePanel(this);
-
 
         inventory.linkInput(input);
         mouse.linkInput(input);
         mouseWheel.linkInput(input);
         random = new Random();
 
-        player = new Player("John Cena", random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,7, Color.red, input);
+        player = new Player(username, random.nextInt(SCREEN_WIDTH),random.nextInt(SCREEN_HEIGHT), 40,7, Color.red, input);
         player.linkInput(input);
         player.linkInventory(inventory);
         player.linkCountry(country);
@@ -85,7 +120,6 @@ public class GamePanel extends JPanel implements ActionListener {
             virus.setPlayer(player);
             virusOnScreen.add(virus);
             Virus.totalNumberOfViruses++;
-
         }
 
         //gel = new Gel(1, random.nextInt(SCREEN_WIDTH-20)+10, random.nextInt(SCREEN_HEIGHT-20)+10);
@@ -99,27 +133,60 @@ public class GamePanel extends JPanel implements ActionListener {
         running = true;
         //spawnTimer = new Timer();
 
-        timer = new Timer(DELAY, this);
-        timer.start();
 
         java.util.Timer t = new java.util.Timer();
 
-        enemySpawner.start();
-        gelSpawner.start();
-        maskSpawner.start();
-        vaccineSpawner.start();
-        country.causeDeaths.start();
-        country.causeInfections.start();
+        try{
+            enemySpawner.start();
+            gelSpawner.start();
+            maskSpawner.start();
+            vaccineSpawner.start();
+            country.causeDeaths.start();
+            country.causeInfections.start();
+
+        }catch (IllegalThreadStateException e){
+            enemySpawner.notify();
+            gelSpawner.notify();
+            maskSpawner.notify();
+            vaccineSpawner.notify();
+            country.causeDeaths.notify();
+            country.causeInfections.notify();
+            //e.printStackTrace();
+        }
+
     }
 
     public void endGame(){
 
-        timer.stop();
+        //timer.stop();
 
-        ReadScore.scores.add(new Score(player.name, player.country.country, Virus.totalNumberOfVirusesKilled, Virus.totalNumberOfContacts, country.getHealthyPopulation(), country.getInfectedPopulation(), country.getDeadPopulation()));
 
+        try{
+            enemySpawner.sleep(1000000);
+            gelSpawner.sleep(1000000);
+            maskSpawner.sleep(1000000);
+            vaccineSpawner.sleep(1000000);
+            country.causeDeaths.sleep(1000000);
+            country.causeInfections.sleep(1000000);
+            timer.notify();
+
+        }catch (IllegalThreadStateException | InterruptedException e){
+            e.printStackTrace();
+        }
+
+
+
+        itemsOnScreen.removeAll(itemsOnScreen);
+        virusOnScreen.removeAll(virusOnScreen);
+        bulletsOnScreen.removeAll(bulletsOnScreen);
+
+        ReadScore.scores.add(new Score(player.name, player.country.country, 0, Virus.totalNumberOfVirusesKilled, Virus.totalNumberOfContacts, country.getHealthyPopulation(), country.getInfectedPopulation(), country.getDeadPopulation(), Gel.totalNumberOfGelUsed, Mask.totalNumberOfMaskUsed, Vaccine.totalNumberOfVaccineUsed));
+        Collections.sort(ReadScore.scores);
         WriteScore wr = new WriteScore("src/score.txt");
-        System.exit(-1);
+        System.out.println("EXIT");
+        //System.exit(-1);
+
+        state = STATE.END;
 
     }
 
@@ -271,13 +338,12 @@ public class GamePanel extends JPanel implements ActionListener {
 
         }
 
-
-
     }
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        g.drawImage(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
+        //g.drawImage(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
+
         draw(g);
 
     }
@@ -285,6 +351,12 @@ public class GamePanel extends JPanel implements ActionListener {
     public void draw(Graphics g){
 
         if(state == STATE.GAME){
+
+
+
+            g.setColor(Color.red);
+            g.fillRect(300,300,300,300);
+
             int virusSize = GamePanel.virusOnScreen.size(); // control variable
             // I was getting an error which I think it was caused when a new virus was created and added to the list while the program was inside this loop
             // The error was ConcurrentModificationException
@@ -328,8 +400,16 @@ public class GamePanel extends JPanel implements ActionListener {
 
             country.draw(g);
             inventory.draw(g);
-        }
 
+
+        }else if(state == STATE.MENU){
+            menu.draw(g);
+
+        }else if(state == STATE.LEADERBOARD){
+            leaderboard.draw(g);
+        }else if(state == STATE.END){
+            gameover.draw(g);
+        }
 
     }
 
@@ -345,8 +425,16 @@ public class GamePanel extends JPanel implements ActionListener {
             checkItem();
             checkVirus();
             checkBulletCollision();
-            repaint();
+            country.checkPopulation();
+
+        }else if(state == STATE.MENU ){
+
+        }else if(state == STATE.LEADERBOARD ){
+
         }
+
+        repaint();
+
 
     }
 

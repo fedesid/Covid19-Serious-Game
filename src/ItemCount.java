@@ -51,15 +51,4 @@ public class ItemCount implements Comparable {
             return 0;
         }
     }
-
-    /*
-    @Override
-    public String toString() {
-        return "ItemCount{" +
-                "totalQuantity=" + totalQuantity +
-                ", currentQuantity=" + currentQuantity +
-                '}';
-    }
-
-     */
 }

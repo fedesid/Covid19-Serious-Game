@@ -44,13 +44,13 @@ public class Country {
     }
 
     public void takeDamage(int damage){
-        checkPopulation();
+        //checkPopulation();
         int infected = getInitialPopulation()/10000;
         if( infected < getHealthyPopulation() ){
             this.infectedPopulation += infected;
             this.healthyPopulation = getInitialPopulation() - getInfectedPopulation() - getDeadPopulation();
         }
-        checkPopulation();
+        //checkPopulation();
     }
 
     public void causeDeaths(int ratio){
@@ -66,7 +66,7 @@ public class Country {
     }
 
     public void causeInfections(int ratio){
-        checkPopulation();
+        //checkPopulation();
         int infections = getInitialPopulation()/ratio;
         if(infections < getHealthyPopulation() ){
             this.infectedPopulation += infections;
@@ -76,7 +76,7 @@ public class Country {
         }
         this.healthyPopulation = getInitialPopulation() - getInfectedPopulation() - getDeadPopulation();
         this.deadPopulation = getInitialPopulation() - getHealthyPopulation() - getInfectedPopulation();
-        checkPopulation();
+        //checkPopulation();
     }
 
     public void healPopulation(int ratio){

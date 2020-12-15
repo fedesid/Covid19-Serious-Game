@@ -19,9 +19,7 @@ public class Player extends Entity {
     InputHandler input;
     Country country;
 
-    static BufferedImage mask;
-    static BufferedImage hand;
-    static BufferedImage gel, vaccine;
+    static BufferedImage mask, hand, gel, vaccine;
 
     static {
         try {

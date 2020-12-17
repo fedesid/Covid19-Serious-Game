@@ -20,7 +20,6 @@ public class ReadCountries {
 
                 countriesStats.put(input[0], Integer.valueOf(input[1]) );
 
-
             }
 
             sc.close();

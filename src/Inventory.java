@@ -33,6 +33,17 @@ public class Inventory {
         this.input = input;
     }
 
+    public static void clear(){
+
+        for(int i=0; i<items.length; i++){
+
+            items[i].setCurrentQuantity(0);
+            items[i].setTotalQuantity(0);
+
+        }
+
+    }
+
     public void paintComponent(Graphics g) {
 
     }

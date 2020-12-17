@@ -122,6 +122,12 @@ public class Virus extends Entity {
         return range;
     }
 
+    public static void clear(){
+        totalNumberOfContacts = 0;
+        totalNumberOfViruses = 0;
+        totalNumberOfVirusesKilled = 0;
+    }
+
     public void setContact(boolean contact) {
 
         this.prevContact = this.contact;

@@ -32,9 +32,17 @@ public class Score implements Comparable<Score> {
         return 10*( (((double)(this.kills+1))/((double)(this.contacts+1))) * (this.nOfGel+2*this.nOfMask+3*this.nOfVaccine) );
     }
 
+    public double getScore() {
+        return score;
+    }
+
     @Override
     public String toString() {
         return String.format("%-10s %-10s %-10.0f %-10d %-10d %-10d %-10d %-10d %-10d %-10d %-10d", playerName, country, score, kills, contacts, alive, infected, dead, nOfGel, nOfMask, nOfVaccine);
+    }
+
+    public String leaderboard(){
+        return String.format("%-10s %-10s %-10.0f %-10d %-10d", playerName, country, score, kills, contacts);
     }
 
     @Override

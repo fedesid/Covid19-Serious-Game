@@ -90,6 +90,10 @@ public class Player extends Entity {
     public int getPlayerSize(){return this.playerSize;}
     public int getSpeed(){return this.speed;}
 
+    public String getName() {
+        return name;
+    }
+
     public void setXpos(int xpos) {
         this.xpos = xpos;
     }

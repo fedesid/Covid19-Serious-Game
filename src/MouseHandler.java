@@ -3,6 +3,7 @@ import java.io.IOException;
 import java.util.Iterator;
 
 public class MouseHandler implements MouseListener {
+
     GamePanel gp;
     InputHandler input;
 
@@ -36,6 +37,7 @@ public class MouseHandler implements MouseListener {
                 if (Inventory.items[0].compareTo(0) > 0){
 
                     Gel.totalNumberOfGelUsed++;
+                    Inventory.items[0].upTotalCount();
                     Inventory.items[0].downCurrentCount();
                     xcoo = mouseEvent.getX();
                     ycoo = mouseEvent.getY();
@@ -57,6 +59,7 @@ public class MouseHandler implements MouseListener {
 
                     Mask.totalNumberOfMaskUsed++;
                     gp.player.wearMask(true);
+                    Inventory.items[1].upTotalCount();
                     Inventory.items[1].downCurrentCount();
 
                 }
@@ -67,6 +70,7 @@ public class MouseHandler implements MouseListener {
                 if (Inventory.items[2].compareTo(0) > 0){
                     Vaccine.totalNumberOfVaccineUsed++;
 
+                    Inventory.items[2].upTotalCount();
                     Inventory.items[2].downCurrentCount();
 
                     for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext(); ){
@@ -96,12 +100,8 @@ public class MouseHandler implements MouseListener {
             // Play button
             if( gp.menu.play.checkClick(mouseEvent.getX(), mouseEvent.getY())  ){
                 System.out.println("PRESSED PLAY");
-                try {
-                    gp.startGame();
-                    gp.state = GamePanel.STATE.GAME;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
+                gp.nameInputField.setVisible(true);
+                gp.state = GamePanel.STATE.SELECTION;
 
             // Score button
             }else if( gp.menu.scores.checkClick(mouseEvent.getX(), mouseEvent.getY()) ){
@@ -122,16 +122,56 @@ public class MouseHandler implements MouseListener {
                 gp.state = GamePanel.STATE.MENU;
 
             }
+
+        // Selection state
+        }else if(gp.state == GamePanel.STATE.SELECTION){
+
+            for(Iterator<CountryGraphics> countryGraphicsIterator = CountryGraphics.countryGraphicsList.iterator(); countryGraphicsIterator.hasNext();){
+                CountryGraphics countryGraphics = countryGraphicsIterator.next();
+
+                if(countryGraphics.checkClick(mouseEvent.getX(), mouseEvent.getY())){
+
+                    countryGraphics.toggleSelection();
+                    GamePanel.usercountry = countryGraphics.getName();
+                }
+
+            }
+
+            // Play button
+            if(gp.selection.play.checkClick(mouseEvent.getX(), mouseEvent.getY())){
+
+                try {
+                    System.out.println("PRESSED PLAY");
+                    gp.username = gp.nameInputField.getText();
+                    gp.nameInputField.setVisible(false);
+
+                    gp.state = GamePanel.STATE.GAME;
+                    gp.startGame();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            // Back button
+            }else if( gp.selection.back.checkClick(mouseEvent.getX(), mouseEvent.getY())  ){
+                System.out.println("PRESSED BACK");
+                gp.state = GamePanel.STATE.MENU;
+
+            }
+
+        // Gameover state
         }else if(gp.state == GamePanel.STATE.END){
 
+            // Menu button
             if(gp.gameover.mainMenu.checkClick(mouseEvent.getX(), mouseEvent.getY())){
                 System.out.println("PRESSED MENU");
                 gp.state = GamePanel.STATE.MENU;
 
+            // Scores button
             }else if(gp.gameover.scores.checkClick(mouseEvent.getX(), mouseEvent.getY())){
                 System.out.println("PRESSED SCORES");
                 gp.state = GamePanel.STATE.LEADERBOARD;
 
+            // Restart button
             }else if(gp.gameover.restart.checkClick(mouseEvent.getX(), mouseEvent.getY())){
                 try {
                     System.out.println("PRESSED RESTART");
@@ -140,6 +180,11 @@ public class MouseHandler implements MouseListener {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
+
+            // Quit button
+            }else if(gp.gameover.quit.checkClick(mouseEvent.getX(), mouseEvent.getY())){
+                System.out.println("PRESSED QUIT");
+                System.exit(-1);
             }
 
         }
@@ -163,15 +208,13 @@ public class MouseHandler implements MouseListener {
 
     }
 
-
-
     Thread maskTime = new Thread(new Runnable() {
 
         public void run() {
 
             while(true) {
 
-                if(gp.state == GamePanel.STATE.GAME ){
+                if(GamePanel.state == GamePanel.STATE.GAME ){
 
                     if( Math.abs(startTime - System.currentTimeMillis())/1000 > Mask.maskDuration ){
                         gp.player.wearMask(false);
@@ -238,7 +281,6 @@ class MouseWheelHandler implements MouseWheelListener {
                 input.three.toggle(true);
             }
         }
-
 
     }
 }

@@ -3,8 +3,11 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class Country {
+
+    static ArrayList<Country> countriesList = new ArrayList<>();
 
     String country;
     GamePanel gp;
@@ -30,6 +33,16 @@ public class Country {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        try{
+
+            causeDeaths.start();
+            causeInfections.start();
+
+        }catch (IllegalThreadStateException e){
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -104,6 +117,14 @@ public class Country {
         return deadPopulation;
     }
 
+    public String getCountry() {
+        return country;
+    }
+
+    public BufferedImage getFlag() {
+        return flag;
+    }
+
     public void draw(Graphics g){
 
         g.setColor(Color.yellow);
@@ -124,11 +145,22 @@ public class Country {
 
     }
 
+    public void drawFlag(Graphics g, int xpos, int xp, int ypos, int yp, int size){
+
+        Menus.drawCenteredImage(flag, size, xpos, xp, ypos, yp, g);
+        Menus.drawCenteredString(this.getCountry(), xpos, xp, ypos+size*2/3, yp+size*2/3, new Font("LATO", Font.ITALIC, 30), new Color(0xFFFFFF), g);
+
+    }
+
     Thread causeDeaths = new Thread(new Runnable() {
         public void run() {
             while(true) {
 
-                causeDeaths(1000);
+                if(gp.state == GamePanel.STATE.GAME){
+
+                    causeDeaths(1000);
+
+                }
 
                 try {
                     Thread.sleep(1000);
@@ -143,8 +175,12 @@ public class Country {
         public void run() {
             while(true) {
 
-                if(Virus.totalNumberOfContacts!=0){
-                    causeInfections(1000);
+                if(gp.state == GamePanel.STATE.GAME){
+
+                    if(Virus.totalNumberOfContacts!=0){
+                        causeInfections(1000);
+                    }
+
                 }
 
                 try {

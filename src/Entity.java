@@ -22,7 +22,6 @@ public abstract class Entity {
         return false;
     }
 
-
     public abstract void draw(Graphics g);
 
     public int getXpos() {

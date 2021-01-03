@@ -3,7 +3,7 @@ import java.util.Iterator;
 
 public class SelectPlayerGraphics extends Menus {
 
-    Button play, back;
+    Button play, back, name;
 
     int btnSize = 300;
 
@@ -12,9 +12,11 @@ public class SelectPlayerGraphics extends Menus {
 
         play = new Button("PLAY", (GamePanel.SCREEN_WIDTH/3)-btnSize-50, (GamePanel.SCREEN_HEIGHT/2)+100, btnSize, btnSize/3,80,70,50);
         back = new Button("BACK", 20,20,100,50,20,30,20);
+        name = new Button("NAME", 320, 15, 100, 50, 20, 30, 30);
 
         buttons.add(play);
         buttons.add(back);
+        buttons.add(name);
 
         int nOfLines = 12;
         int xunit = (GamePanel.SCREEN_WIDTH/nOfLines);

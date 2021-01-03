@@ -69,7 +69,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public GamePanel() throws IOException {
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
-        this.setBackground(new Color(0x008C1C));
+        this.setBackground(new Color(0x00FF32));
         this.setFocusable(true);
 
         /*
@@ -349,7 +349,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
         Graphics2D g2d = (Graphics2D) g;
         g2d.drawImage(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this);
-
+        
         draw(g);
 
     }

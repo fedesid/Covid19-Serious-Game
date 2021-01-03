@@ -56,6 +56,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
     static BufferedImage bg;
 
+    Toolkit toolkit = Toolkit.getDefaultToolkit();
+    Image background = toolkit.getImage("src/Sprites/Background/main-pixel-art.gif");
+
     static {
         try {
             bg = ImageIO.read(new File("src/Sprites/Background/bg.png"));
@@ -165,7 +168,6 @@ public class GamePanel extends JPanel implements ActionListener {
         running = true;
         //spawnTimer = new Timer();
 
-
         java.util.Timer t = new java.util.Timer();
 
     }
@@ -173,8 +175,6 @@ public class GamePanel extends JPanel implements ActionListener {
     public void endGame(){
 
         //timer.stop();
-
-
 
         userScore = new Score(player.name, player.country.country, 0, Virus.totalNumberOfVirusesKilled, Virus.totalNumberOfContacts, country.getHealthyPopulation(), country.getInfectedPopulation(), country.getDeadPopulation(), Inventory.items[0].getTotalQuantity(), Inventory.items[1].getTotalQuantity(), Inventory.items[2].getTotalQuantity());
         ReadScore.scores.add(userScore);
@@ -346,7 +346,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void paintComponent(Graphics g){
         super.paintComponent(g);
-        //g.drawImage(bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
+
+        Graphics2D g2d = (Graphics2D) g;
+        g2d.drawImage(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this);
 
         draw(g);
 

@@ -1,9 +1,9 @@
 import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public abstract class Item extends Entity {
     String name;
-    int itemXpos;
-    int itemYpos;
+    BufferedImage sprite;
 
     public static final int SIZE = 50;
 
@@ -15,6 +15,12 @@ public abstract class Item extends Entity {
         return SIZE;
     }
 
-    public abstract void draw(Graphics g);
+    public void draw(Graphics g){
+        g.setColor(new Color(0x7C00E1FF, true));
+        g.fillOval(xpos, ypos, SIZE, SIZE);
+        g.setColor(new Color(0xFF5B6F72, true));
+        g.drawOval(xpos, ypos, SIZE, SIZE);
+        g.drawImage(sprite, xpos, ypos, SIZE, SIZE, null);
+    }
 
 }

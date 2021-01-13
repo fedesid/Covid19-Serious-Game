@@ -8,8 +8,12 @@ public class Vaccine extends Item {
 
     static int totalNumberOfVaccineUsed;
 
-    static BufferedImage sprite;
-    static {
+    int size = 40;
+
+    public Vaccine(int xpos, int ypos) {
+        super(xpos, ypos);
+        this.name = "Vaccine";
+
         try {
             sprite = ImageIO.read(new File("src/Sprites/Entities/vaccine.png"));
         } catch (IOException e) {
@@ -17,21 +21,9 @@ public class Vaccine extends Item {
         }
     }
 
-    int size = 40;
-
-    public Vaccine(int xpos, int ypos) {
-        super(xpos, ypos);
-        this.name = "Vaccine";
-    }
-
     @Override
     public void paintComponent(Graphics g) {
 
-    }
-
-    @Override
-    public void draw(Graphics g) {
-        g.drawImage(sprite, xpos, ypos, size, size, null);
     }
 
 }

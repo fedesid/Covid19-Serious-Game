@@ -66,7 +66,7 @@ public class MouseHandler implements MouseListener {
 
             }
 
-            if(input.three.isPressed()){ // Vaccine
+            if(input.three.isPressed() || input.e.isPressed()){ // Vaccine
                 if (Inventory.items[2].compareTo(0) > 0){
                     Vaccine.totalNumberOfVaccineUsed++;
 

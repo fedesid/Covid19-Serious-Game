@@ -9,8 +9,12 @@ public class Mask extends Item {
     static int totalNumberOfMaskUsed = 0;
     static int maskDuration = 5;
 
-    static BufferedImage sprite;
-    static {
+    int size = 40;
+
+    public Mask(int xpos, int ypos) {
+        super(xpos, ypos);
+        this.name = "Mask";
+
         try {
             sprite = ImageIO.read(new File("src/Sprites/Entities/mask.png"));
         } catch (IOException e) {
@@ -18,21 +22,8 @@ public class Mask extends Item {
         }
     }
 
-    int size = 40;
-
-    public Mask(int xpos, int ypos) {
-        super(xpos, ypos);
-        this.name = "Mask";
-    }
-
     @Override
     public void paintComponent(Graphics g) {
 
-    }
-
-    @Override
-    public void draw(Graphics g) {
-
-        g.drawImage(sprite, xpos, ypos, size, size, null);
     }
 }

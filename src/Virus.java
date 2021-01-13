@@ -4,6 +4,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.Random;
 
 // TODO virus that sneezes at you and does not move. it can spawn near the sides of the map
 // TODO vaccine deals "splash" damage. the closer the virus the higher the damage. further the virus is the less damage it takes (close to nothing)
@@ -27,20 +28,12 @@ public class Virus extends Entity {
     int initHealth;
     int currentHealth;
     int damage;
+    int imgNum;
+    Random random = new Random();
 
     int cc = 0;
 
-    static BufferedImage sprite, sprite2;
-
-    static {
-        try {
-            sprite = ImageIO.read(new File("src/Sprites/Entities/virus.png"));
-            sprite2 = ImageIO.read(new File("src/Sprites/Entities/stink2.png"));
-        } catch (IOException e) {
-            System.out.println("ERROR");
-            e.printStackTrace();
-        }
-    }
+    BufferedImage sprite, sprite2;
 
     public Virus(int xpos, int ypos, int speed) throws IOException {
         super(xpos, ypos);
@@ -49,6 +42,15 @@ public class Virus extends Entity {
         setRange();
         setHealth();
         setDamage();
+
+        try {
+            this.imgNum = random.nextInt(5)+1;
+            sprite = ImageIO.read(new File("src/Sprites/Entities/virus.png"));
+            sprite2 = ImageIO.read(new File("src/Sprites/Entities/stink"+speed+".png"));
+        } catch (IOException e) {
+            System.out.println("ERROR");
+            e.printStackTrace();
+        }
     }
 
     public void setPlayer(Player player){
@@ -160,10 +162,13 @@ public class Virus extends Entity {
     @Override
     public void draw(Graphics g) {
 
+        //Debugging purposes
+        /*
         g.setColor(Color.green);
         g.drawString( String.valueOf(totalNumberOfViruses), 50, 50 );
         g.drawString( String.valueOf(totalNumberOfVirusesKilled), 50, 60 );
         g.drawString( String.valueOf(totalNumberOfContacts), 50, 70 );
+         */
 
         g.drawImage(sprite2, xpos-size/(2*speed),ypos-size/(2*speed),range,range, null);
         //g.setColor(new Color(0x17000000, true));

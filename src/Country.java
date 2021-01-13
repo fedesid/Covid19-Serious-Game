@@ -127,21 +127,32 @@ public class Country {
 
     public void draw(Graphics g){
 
-        g.setColor(Color.yellow);
-        g.fillRect(10,10, GamePanel.SCREEN_WIDTH-20, 10);
+        int height = 20;
+        int x = GamePanel.SCREEN_WIDTH/3;
+        int y = (GamePanel.SCREEN_HEIGHT/20)*1;
+        int width = GamePanel.SCREEN_WIDTH - x*2;
 
-        g.setColor(Color.green);
-        g.fillRect(10,10, (int) ( ((double)this.healthyPopulation /(double)this.initialPopulation)*((double)GamePanel.SCREEN_WIDTH ) -20 ), 10);
+        g.setColor(new Color(0xFFD500));
+        g.fillRect(x,y, width, height);
 
-        g.setColor(Color.red);
-        g.fillRect(GamePanel.SCREEN_WIDTH-20-(int) ( ((double)this.deadPopulation /(double)this.initialPopulation)*((double)GamePanel.SCREEN_WIDTH ) -20 ), 10, (int) ( ((double)this.deadPopulation /(double)this.initialPopulation)*((double)GamePanel.SCREEN_WIDTH ) -10 ), 10 );
+        g.setColor(new Color(0x3CA82D));
+        g.fillRect(x,y, (int) ( ((double)this.healthyPopulation /(double)this.initialPopulation)*(width)  ), height);
 
+        g.setColor(new Color(0xDE2B2B));
+        g.fillRect(x+width - (int) ( ((double)this.deadPopulation /(double)this.initialPopulation)*(width)), y, (int)( ((double)this.deadPopulation /(double)this.initialPopulation)*(width)), height  );
+
+        g.setColor(Color.white);
+        g.drawRect(x, y, width, height);
+
+        //Debugging purposes
+        /*
         g.setColor(Color.green);
         g.drawString( "Initial\t\t: " + String.valueOf(initialPopulation), 50, 80 );
         g.drawString( "Initial\t\t: " + String.valueOf(getHealthyPopulation() + getInfectedPopulation() + getDeadPopulation()), 50, 90 );
         g.drawString( "Healthy\t\t: " + String.valueOf(healthyPopulation), 50, 100 );
         g.drawString( "Infected\t\t: " + String.valueOf(infectedPopulation), 50, 110 );
         g.drawString( "Dead\t\t: " + String.valueOf(deadPopulation), 50, 120 );
+         */
 
     }
 

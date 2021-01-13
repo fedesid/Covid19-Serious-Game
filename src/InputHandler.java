@@ -24,6 +24,9 @@ public class InputHandler implements KeyListener {
     public Key left = new Key();
     public Key right = new Key();
 
+    public Key q = new Key();
+    public Key e = new Key();
+
     public Key one = new Key();
     public Key two = new Key();
     public Key three = new Key();
@@ -77,6 +80,13 @@ public class InputHandler implements KeyListener {
         }
         if (keyCode == KeyEvent.VK_D){
             right.toggle(isPressed);
+        }
+
+        if(keyCode == KeyEvent.VK_Q){
+            q.toggle(isPressed);
+        }
+        if(keyCode == KeyEvent.VK_E){
+            e.toggle(isPressed);
         }
     }
 

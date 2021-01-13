@@ -25,6 +25,8 @@ public class GamePanel extends JPanel implements ActionListener {
     static final int DELAY = 20;
     boolean running = false;
 
+    static double flashyDeath = 0.1;
+
     Timer timer;
     Random random;
     InputHandler input;
@@ -55,13 +57,19 @@ public class GamePanel extends JPanel implements ActionListener {
     static String usercountry;
 
     static BufferedImage bg;
+    static BufferedImage emptyBg;
+    static BufferedImage mainscreen;
+    static BufferedImage leaderboard_bg;
 
     Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Image background = toolkit.getImage("src/Sprites/Background/main-pixel-art.gif");
+    Image background = toolkit.getImage("src/Sprites/Background/transparent.gif");
 
     static {
         try {
-            bg = ImageIO.read(new File("src/Sprites/Background/bg.png"));
+            bg = ImageIO.read(new File("src/Sprites/Background/bg2.gif"));
+            emptyBg = ImageIO.read(new File("src/Sprites/Background/empty bg.png"));
+            mainscreen = ImageIO.read(new File("src/Sprites/Background/mainscreen.png"));
+            leaderboard_bg = ImageIO.read(new File("src/Sprites/Background/leaderboard.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -72,36 +80,20 @@ public class GamePanel extends JPanel implements ActionListener {
         this.setBackground(new Color(0x00FF32));
         this.setFocusable(true);
 
-        /*
-        Scanner userInput = new Scanner(System.in);
-        System.out.println("Enter name");
-        username = userInput.nextLine();
-        System.out.println("Enter country");
-        usercountry = userInput.nextLine();
-         */
-
-
-
         rs = new ReadScore("src/score.txt");
 
         mouse = new MouseHandler(this);
         this.setBackground(Color.black);
 
-
-
         timer = new Timer(DELAY, this);
         timer.start();
 
         nameInputField = new JTextField(8);
-        //textField.setBounds(5, 5, 280, 50); // to get height, set large font
         nameInputField.setFont(nameInputField.getFont().deriveFont(50f));
         this.add(nameInputField, BorderLayout.SOUTH);
         nameInputField.setVisible(true);
         nameInputField.setBackground(new Color(1, true));
         nameInputField.setForeground(new Color(0xFFFFFF));
-
-        //this.startGame();
-        //this.addKeyListener(new MyKeyAdapter());
 
         try{
             enemySpawner.start();
@@ -157,16 +149,7 @@ public class GamePanel extends JPanel implements ActionListener {
             Virus.totalNumberOfViruses++;
         }
 
-        //gel = new Gel(1, random.nextInt(SCREEN_WIDTH-20)+10, random.nextInt(SCREEN_HEIGHT-20)+10);
-        //Mask mask = new Mask(1, random.nextInt(SCREEN_WIDTH-20)+10, random.nextInt(SCREEN_HEIGHT-20)+10);
-        //Vaccine vaccine = new Vaccine(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10);
-
-        //itemsOnScreen.add(gel);
-        //itemsOnScreen.add(mask);
-        //itemsOnScreen.add(vaccine);
-
         running = true;
-        //spawnTimer = new Timer();
 
         java.util.Timer t = new java.util.Timer();
 
@@ -174,14 +157,11 @@ public class GamePanel extends JPanel implements ActionListener {
 
     public void endGame(){
 
-        //timer.stop();
-
         userScore = new Score(player.name, player.country.country, 0, Virus.totalNumberOfVirusesKilled, Virus.totalNumberOfContacts, country.getHealthyPopulation(), country.getInfectedPopulation(), country.getDeadPopulation(), Inventory.items[0].getTotalQuantity(), Inventory.items[1].getTotalQuantity(), Inventory.items[2].getTotalQuantity());
         ReadScore.scores.add(userScore);
         Collections.sort(ReadScore.scores);
         WriteScore wr = new WriteScore("src/score.txt");
-        System.out.println("EXIT");
-        //System.exit(-1);
+        System.out.println("Game Ended");
 
         itemsOnScreen.removeAll(itemsOnScreen);
         virusOnScreen.removeAll(virusOnScreen);
@@ -192,6 +172,24 @@ public class GamePanel extends JPanel implements ActionListener {
 
         state = STATE.END;
 
+    }
+
+    public static double calcAngleSin(int x1, int y1, int x2, int y2){
+        double hyp = calcDistance(x1, y1, x2, y2);
+        return Math.toDegrees( Math.asin( (y1-y2)/hyp ) ) ;
+    }
+    public static double calcAngleCos(int x1, int y1, int x2, int y2){
+        double hyp = calcDistance(x1, y1, x2, y2);
+        return Math.toDegrees( Math.acos( (x1-x2)/hyp )-Math.PI/2 ) ;
+    }
+
+    public static double calcDistance(int x1, int y1, int x2, int y2){
+        return Math.sqrt( Math.pow(Math.abs(x1-x2) , 2) + Math.pow( Math.abs( y1-y2) , 2) );
+    }
+
+    public static double calcSlope(double x1, double y1, double x2, double y2 ){
+        System.out.println(Double.valueOf( (y1-y2)/(x2-x1) ) );
+        return (y1-y2)/(x2-x1);
     }
 
     public void checkCollision(){
@@ -221,48 +219,24 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
-    public static double calcAngleSin(int x1, int y1, int x2, int y2){
-        double hyp = calcDistance(x1, y1, x2, y2);
-        return Math.toDegrees( Math.asin( (y1-y2)/hyp ) ) ;
-    }
-    public static double calcAngleCos(int x1, int y1, int x2, int y2){
-        double hyp = calcDistance(x1, y1, x2, y2);
-        return Math.toDegrees( Math.acos( (x1-x2)/hyp )-Math.PI/2 ) ;
-    }
-
-    public static double calcDistance(int x1, int y1, int x2, int y2){
-        return Math.sqrt( Math.pow(Math.abs(x1-x2) , 2) + Math.pow( Math.abs( y1-y2) , 2) );
-    }
-
-    public static double calcSlope(double x1, double y1, double x2, double y2 ){
-        System.out.println(Double.valueOf( (y1-y2)/(x2-x1) ) );
-        return (y1-y2)/(x2-x1);
-    }
-
     public void checkItem(){
 
         if( itemsOnScreen.size() != 0 ){
             for(Item item : itemsOnScreen){
 
-                //TODO extrapolate this method (check distance between item and player) you could create a method inside the Item abstract class
                 if( item.collision(player) ){
 
                     System.out.println("CONTACT");
                     System.out.println(item.getClass().toString());
 
-                    //TODO change the way the inventory works. Use classes instead of indexes i.e. Class mask, class gel, class vaccine
-
                     if(item.getClass().toString().equals("class Gel")){
                         Inventory.items[0].upCurrentCount(5);
-                        //itemsOnScreen.add(new Gel(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
 
                     }else if(item.getClass().toString().equals("class Mask")){
                         Inventory.items[1].upCurrentCount(1);
-                        //itemsOnScreen.add(new Mask(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
 
                     }else if(item.getClass().toString().equals("class Vaccine")){
                         Inventory.items[2].upCurrentCount(1);
-                        //itemsOnScreen.add(new Vaccine(1, random.nextInt(SCREEN_WIDTH-30)+10, random.nextInt(SCREEN_HEIGHT-30)+10));
 
                     }
                     itemsOnScreen.remove(item);
@@ -347,9 +321,7 @@ public class GamePanel extends JPanel implements ActionListener {
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
-        Graphics2D g2d = (Graphics2D) g;
-        g2d.drawImage(background, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, this);
-        
+        g.drawImage(mainscreen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
         draw(g);
 
     }
@@ -357,6 +329,8 @@ public class GamePanel extends JPanel implements ActionListener {
     public void draw(Graphics g){
 
         if(state == STATE.GAME){
+            g.drawImage(emptyBg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
+            g.drawImage(background, SCREEN_WIDTH/4, SCREEN_HEIGHT/4, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, null);
 
             int virusSize = GamePanel.virusOnScreen.size(); // control variable
             // I was getting an error which I think it was caused when a new virus was created and added to the list while the program was inside this loop
@@ -394,6 +368,18 @@ public class GamePanel extends JPanel implements ActionListener {
 
             player.draw(g);
 
+            if( (( (double)country.getHealthyPopulation()/(double)country.getInitialPopulation())*100) < 10 ){
+                g.setColor(new Color(255,0,0, (int)(100*flashyDeath)));
+                g.fillRect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT);
+            }
+
+            if(flashyDeath > 0.0){
+                flashyDeath += 0.05;
+            }
+            if(flashyDeath > 1.0){
+                flashyDeath = 0.1;
+            }
+
             if(Virus.isInContact && !player.maskOn){ // Show the user that they are taking damage
                 g.setColor(new Color(0x28FF0000, true));
                 g.fillRect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -407,6 +393,7 @@ public class GamePanel extends JPanel implements ActionListener {
             menu.draw(g);
 
         }else if(state == STATE.LEADERBOARD){
+            g.drawImage(leaderboard_bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
             leaderboard.draw(g);
 
         }else if(state == STATE.SELECTION){

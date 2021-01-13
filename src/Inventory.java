@@ -20,11 +20,6 @@ public class Inventory {
         ItemCount vaccine = new ItemCount();
 
         this.gp = gp;
-        /*
-        items.add(Gel.getCurrentQuantity());
-        items.add(Mask.getCurrentQuantity());
-        items.add(Vaccine.getCurrentQuantity());
-         */
         items = new ItemCount[]{gel, mask, vaccine};
 
     }
@@ -58,14 +53,18 @@ public class Inventory {
             g.drawLine( xpos+i, ypos, xpos+i, ypos+height);
         }
 
-        g.setFont(new Font("Lato", Font.ITALIC, 25));
-        g.drawString("Gel", xpos, ypos);
-        g.drawString("Mask", xpos + width/3, ypos);
-        g.drawString("Vaccine", xpos + 2*(width/3), ypos);
+        Font font = new Font("Corbel", Font.PLAIN, 35);
+
+        Menus.drawCenteredString("Gel", width/3, xpos*2, height, (int) (ypos*2-height*1.4), font, Color.white, g);
+        Menus.drawCenteredString("Mask", width/3, xpos*2 + 2*(width/3), height, (int) (ypos*2-height*1.4), font, Color.white, g);
+        Menus.drawCenteredString("Vaccine", width/3, xpos*2 + 4*(width/3), height, (int) (ypos*2-height*1.4), font, Color.white, g);
 
         int j= 0;
         for(int i=width/3-width/3/2; i<width; i+=width/3){
-            g.drawString(String.valueOf(items[j]),xpos+i, ypos+height/2);
+
+            Menus.drawCenteredString(String.valueOf(items[j]), width/3, xpos*2 + j*(2*(width/3)), height, ypos*2, font, Color.white, g);
+
+            //g.drawString(String.valueOf(items[j]),xpos+i, ypos+height/2);
             j++;
         }
 

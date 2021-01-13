@@ -36,13 +36,29 @@ public class Score implements Comparable<Score> {
         return score;
     }
 
+    public String getPlayerName() {
+        return playerName;
+    }
+
+    public String getCountry() {
+        return country;
+    }
+
+    public int getKills() {
+        return kills;
+    }
+
+    public int getContacts() {
+        return contacts;
+    }
+
     @Override
     public String toString() {
         return String.format("%-10s %-10s %-10.0f %-10d %-10d %-10d %-10d %-10d %-10d %-10d %-10d", playerName, country, score, kills, contacts, alive, infected, dead, nOfGel, nOfMask, nOfVaccine);
     }
 
     public String leaderboard(){
-        return String.format("%-10s %-10s %-10.0f %-10d %-10d", playerName, country, score, kills, contacts);
+        return String.format("%s %s %s %s %s", playerName, country, (int)score, kills, contacts);
     }
 
     @Override

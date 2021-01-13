@@ -141,16 +141,5 @@ public class Player extends Entity {
             g.drawImage(vaccine, xpos+5, ypos+20, playerSize/2, playerSize/2, null);
         }
 
-/*
-        g.setColor(new Color(0));
-        for(int i=0; i<1; i++){
-            g.drawOval(this.xpos,this.ypos, playerSize+1, playerSize+1);
-
-        }
-
-        g.setColor(col);
-        g.fillOval(this.xpos,this.ypos, playerSize, playerSize);
-
- */
     }
 }

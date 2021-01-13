@@ -63,7 +63,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     Toolkit toolkit = Toolkit.getDefaultToolkit();
     Image background = toolkit.getImage("src/Sprites/Background/transparent.gif");
-
+    int test;
     static {
         try {
             bg = ImageIO.read(new File("src/Sprites/Background/bg2.gif"));

@@ -26,7 +26,7 @@ public class SelectPlayerGraphics extends Menus {
         int xindex = (GamePanel.SCREEN_WIDTH/nOfLines)*xcount;
         int yindex = (GamePanel.SCREEN_HEIGHT/nOfLines)*ycount;
 
-        System.out.println(Country.countriesList.size());
+        //System.out.println(Country.countriesList.size());
         for(Iterator<Country> countryIterator = Country.countriesList.iterator(); countryIterator.hasNext();){
             Country country = countryIterator.next();
 

@@ -37,6 +37,8 @@ public class Inventory {
 
         }
 
+        Vaccine.vaccineIsReady = false;
+
     }
 
     public void paintComponent(Graphics g) {

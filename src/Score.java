@@ -11,8 +11,10 @@ public class Score implements Comparable<Score> {
     private int nOfGel;
     private int nOfMask;
     private int nOfVaccine;
+    private int healed;
+    private int timeToDevelop;
 
-    public Score(String playerName, String country, double score, int kills, int contacts, int alive, int infected, int dead, int nOfGel, int nOfMask, int nOfVaccine) {
+    public Score(String playerName, String country, double score, int kills, int contacts, int alive, int infected, int dead, int healed, int nOfGel, int nOfMask, int nOfVaccine, int timeToDevelop) {
         this.playerName = playerName.replace(" ", "-");
         this.country = country;
         this.kills = kills;
@@ -20,16 +22,20 @@ public class Score implements Comparable<Score> {
         this.alive = alive;
         this.infected = infected;
         this.dead = dead;
+        this.healed = healed;
         this.nOfGel = nOfGel;
         this.nOfMask = nOfMask;
         this.nOfVaccine = nOfVaccine;
+        this.timeToDevelop = timeToDevelop;
 
         this.score = calcScore();
     }
 
     public double calcScore(){
 
-        return 10*( (((double)(this.kills+1))/((double)(this.contacts+1))) * (this.nOfGel+2*this.nOfMask+3*this.nOfVaccine) );
+        return  ( ( ( (double) (2*healed + alive)/(double) (infected + dead) ) +1 ) * ( (double) (kills+1)/ (double) (contacts+1) ) * ( ( (nOfGel+1) + (nOfMask+1)*2 ) + ( ( (Math.pow(nOfVaccine, 2)*100)+1 ) / ((double)(timeToDevelop/2)+1) )*20) );
+
+        //return 10*( (((double)(this.kills+1))/((double)(this.contacts+1))) * (this.nOfGel+2*this.nOfMask+3*this.nOfVaccine) );
     }
 
     public double getScore() {
@@ -44,17 +50,17 @@ public class Score implements Comparable<Score> {
         return country;
     }
 
-    public int getKills() {
+    public double getKills() {
         return kills;
     }
 
-    public int getContacts() {
+    public double getContacts() {
         return contacts;
     }
 
     @Override
     public String toString() {
-        return String.format("%-10s %-10s %-10.0f %-10d %-10d %-10d %-10d %-10d %-10d %-10d %-10d", playerName, country, score, kills, contacts, alive, infected, dead, nOfGel, nOfMask, nOfVaccine);
+        return String.format("%-10s %-10s %-10.0f %-10d %-10d %-10d %-10d %-10d %-10d %-10d %-10d %-10d %-10d", playerName, country, score, kills, contacts, alive, infected, dead, healed, nOfGel, nOfMask, nOfVaccine, timeToDevelop);
     }
 
     public String leaderboard(){

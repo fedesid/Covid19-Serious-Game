@@ -16,6 +16,7 @@ public class Country {
     int healthyPopulation;
     int infectedPopulation;
     int deadPopulation;
+    int healedPopulation;
 
     BufferedImage flag;
 
@@ -27,6 +28,7 @@ public class Country {
         healthyPopulation = initialPopulation;
         infectedPopulation = 0;
         deadPopulation = 0;
+        healedPopulation = 0;
 
         try {
             flag = ImageIO.read(new File("src/Sprites/Country/"+country+".png"));
@@ -94,7 +96,7 @@ public class Country {
 
     public void healPopulation(int ratio){
         int cured = getInfectedPopulation()/ratio;
-
+        this.healedPopulation += cured;
         this.healthyPopulation += cured;
         this.infectedPopulation = getInitialPopulation() - getHealthyPopulation() - getDeadPopulation();
         this.deadPopulation = getInitialPopulation() - getHealthyPopulation() - getInfectedPopulation();
@@ -115,6 +117,10 @@ public class Country {
 
     public int getDeadPopulation() {
         return deadPopulation;
+    }
+
+    public int getHealedPopulation() {
+        return healedPopulation;
     }
 
     public String getCountry() {
@@ -169,7 +175,7 @@ public class Country {
 
                 if(gp.state == GamePanel.STATE.GAME){
 
-                    causeDeaths(1000);
+                    causeDeaths((int) (920-(Math.round(Vaccine.difficultyLvl))*8));
 
                 }
 
@@ -189,7 +195,7 @@ public class Country {
                 if(gp.state == GamePanel.STATE.GAME){
 
                     if(Virus.totalNumberOfContacts!=0){
-                        causeInfections(1000);
+                        causeInfections((int) (920-(Math.round(Vaccine.difficultyLvl))*8));
                     }
 
                 }

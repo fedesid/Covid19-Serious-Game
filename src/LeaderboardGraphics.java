@@ -37,20 +37,20 @@ public class LeaderboardGraphics extends Menus {
 
         //draw table
         g.setColor(new Color(0x25FFFFFF, true));
-        g.fillRect(xunit, yunit*3, xunit*10, yunit*8);
+        g.fillRect(xunit*3, yunit*3, xunit*6, yunit*8);
         //g.drawRect(xunit, yunit*3, xunit*10,yunit*8);
 
         g.setColor(new Color(0x4A03FF));
         // draw outer rectangle
         for(int i=0; i<10; i++){
-            g.drawRect(xunit-i, yunit*3-i, xunit*10+i*2,yunit*8+i*2);
+            g.drawRect((xunit*3)-i, yunit*3-i, xunit*6+i*2,yunit*8+i*2);
         }
 
         // draw horizontal lines
         for(int i=0; i<8; i++){
-            g.drawLine(xunit, yunit*(3+i)-1, xunit*11, yunit*(3+i)-1);
-            g.drawLine(xunit, yunit*(3+i), xunit*11, yunit*(3+i));
-            g.drawLine(xunit, yunit*(3+i)+1, xunit*11, yunit*(3+i)+1);
+            g.drawLine(xunit*3, yunit*(3+i)-1, xunit*9, yunit*(3+i)-1);
+            g.drawLine(xunit*3, yunit*(3+i), xunit*9, yunit*(3+i));
+            g.drawLine(xunit*3, yunit*(3+i)+1, xunit*9, yunit*(3+i)+1);
         }
 
         // draw vertical lines
@@ -61,11 +61,11 @@ public class LeaderboardGraphics extends Menus {
 
         Font font = new Font("LATO", Font.BOLD, 30);
 
-        Menus.drawCenteredString("NAME", xunit*2, xunit*2, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
-        Menus.drawCenteredString("COUNTRY", xunit*2, xunit*6, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
-        Menus.drawCenteredString("SCORE", xunit*2, xunit*10, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
-        Menus.drawCenteredString("KILLS", xunit*2, xunit*14, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
-        Menus.drawCenteredString("CONTACTS", xunit*2, xunit*18, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
+        Menus.drawCenteredString("NAME", xunit*2, xunit*6, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
+        Menus.drawCenteredString("COUNTRY", xunit*2, xunit*10, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
+        Menus.drawCenteredString("SCORE", xunit*2, xunit*14, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
+        //Menus.drawCenteredString("KILLS", xunit*2, xunit*14, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
+        //Menus.drawCenteredString("CONTACTS", xunit*2, xunit*18, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
 
         int count = 0;
         for(Iterator<Score> scoreIterator = ReadScore.scores.iterator(); scoreIterator.hasNext();){
@@ -73,12 +73,11 @@ public class LeaderboardGraphics extends Menus {
             String[] leaderboard = score.leaderboard().split(" ");
 
             if(count < 7){
-                for(int i=0; i<5; i++){
-                    Menus.drawCenteredString(leaderboard[i], xunit*2, xunit*(2+4*i), yunit*(4+count), yunit*(5+count), font, new Color(0xFFFFFF), g);
+                for(int i=0; i<3; i++){
+                    Menus.drawCenteredString(leaderboard[i], xunit*2, xunit*(6+4*i), yunit*(4+count), yunit*(5+count), font, new Color(0xFFFFFF), g);
                 }
             }
             count++;
-
 
         }
 

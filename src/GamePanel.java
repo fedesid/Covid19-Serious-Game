@@ -41,6 +41,7 @@ public class GamePanel extends JPanel implements ActionListener {
     LeaderboardGraphics leaderboard;
     SelectPlayerGraphics selection;
     GameOverGraphics gameover;
+    GameplayGraphics gameplay;
 
     JTextField nameInputField;
 
@@ -53,23 +54,35 @@ public class GamePanel extends JPanel implements ActionListener {
     Gel gel;
     Virus virus;
 
+    // TIME VARIABLES IN MILLISECONDS
+    // spawn time of objects in milliseconds
+    static int spawnTimeGel = 5000;
+    static int spawnTimeMask = 15000;
+    static int spawnTimeVaccine = 100;
+    static int spawnTimeVirus = 9000;
+    static int numberOfVirusSpawned = 4; // number of viruses that spawn every n seconds
+    static int roundLength = 150000;
+    static long START_TIME;
+
     String username;
     static String usercountry;
 
-    static BufferedImage bg;
     static BufferedImage emptyBg;
-    static BufferedImage mainscreen;
+    static BufferedImage mainscreen_bg;
     static BufferedImage leaderboard_bg;
+    static BufferedImage playerselection_bg;
+    static BufferedImage gameover_bg;
 
     Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Image background = toolkit.getImage("src/Sprites/Background/transparent.gif");
-    int test;
+    Image earth_and_moon = toolkit.getImage("src/Sprites/Background/transparent.gif");
+
     static {
         try {
-            bg = ImageIO.read(new File("src/Sprites/Background/bg2.gif"));
             emptyBg = ImageIO.read(new File("src/Sprites/Background/empty bg.png"));
-            mainscreen = ImageIO.read(new File("src/Sprites/Background/mainscreen.png"));
+            mainscreen_bg = ImageIO.read(new File("src/Sprites/Background/mainscreen.png"));
             leaderboard_bg = ImageIO.read(new File("src/Sprites/Background/leaderboard.png"));
+            playerselection_bg = ImageIO.read(new File("src/Sprites/Background/playerselection.png"));
+            gameover_bg = ImageIO.read(new File("src/Sprites/Background/gameover.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -109,7 +122,7 @@ public class GamePanel extends JPanel implements ActionListener {
         for(String key : rc.countriesStats.keySet()){
             Country c = new Country(key);
             Country.countriesList.add(c);
-            System.out.println(key);
+            //System.out.println(key);
         }
 
         // INITIALIZING GAME SCREENS (MENUS)
@@ -117,6 +130,7 @@ public class GamePanel extends JPanel implements ActionListener {
         leaderboard = new LeaderboardGraphics(this);
         selection = new SelectPlayerGraphics(this);
         gameover = new GameOverGraphics(this);
+        gameplay = new GameplayGraphics(this);
 
     }
 
@@ -153,11 +167,26 @@ public class GamePanel extends JPanel implements ActionListener {
 
         java.util.Timer t = new java.util.Timer();
 
+        START_TIME = System.currentTimeMillis();
+        Vaccine.difficultyLvl = 1.2;
+        Vaccine.timeToDevelop = 0;
+        Vaccine.updateThreshold();
+        adjustMask = 0;
+        adjustGel = 0;
+        adjustKills = 0;
+        spawnTimeGel = 5000;
+        spawnTimeMask = 15000;
+        spawnTimeVaccine = 100;
+        spawnTimeVirus = 9000;
+        numberOfVirusSpawned = 4;
+        roundLength = 150000;
+        Vaccine.vaccineIsReady = false;
+
     }
 
     public void endGame(){
 
-        userScore = new Score(player.name, player.country.country, 0, Virus.totalNumberOfVirusesKilled, Virus.totalNumberOfContacts, country.getHealthyPopulation(), country.getInfectedPopulation(), country.getDeadPopulation(), Inventory.items[0].getTotalQuantity(), Inventory.items[1].getTotalQuantity(), Inventory.items[2].getTotalQuantity());
+        userScore = new Score(player.name, player.country.country, 0, Virus.totalNumberOfVirusesKilled, Virus.totalNumberOfContacts, country.getHealthyPopulation(), country.getInfectedPopulation(), country.getDeadPopulation(), country.getHealedPopulation(), Inventory.items[0].getTotalQuantity(), Inventory.items[1].getTotalQuantity(), Inventory.items[2].getTotalQuantity(), Vaccine.timeToDevelop);
         ReadScore.scores.add(userScore);
         Collections.sort(ReadScore.scores);
         WriteScore wr = new WriteScore("src/score.txt");
@@ -321,7 +350,7 @@ public class GamePanel extends JPanel implements ActionListener {
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
-        g.drawImage(mainscreen, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
+        g.drawImage(mainscreen_bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
         draw(g);
 
     }
@@ -330,7 +359,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
         if(state == STATE.GAME){
             g.drawImage(emptyBg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
-            g.drawImage(background, SCREEN_WIDTH/4, SCREEN_HEIGHT/4, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, null);
+            g.drawImage(earth_and_moon, SCREEN_WIDTH/4, SCREEN_HEIGHT/4, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, null);
 
             int virusSize = GamePanel.virusOnScreen.size(); // control variable
             // I was getting an error which I think it was caused when a new virus was created and added to the list while the program was inside this loop
@@ -387,6 +416,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
             country.draw(g);
             inventory.draw(g);
+            gameplay.draw(g);
 
         }else if(state == STATE.MENU){
             nameInputField.setVisible(false);
@@ -397,15 +427,20 @@ public class GamePanel extends JPanel implements ActionListener {
             leaderboard.draw(g);
 
         }else if(state == STATE.SELECTION){
+            g.drawImage(playerselection_bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
             selection.draw(g);
 
         }else if(state == STATE.END){
+            g.drawImage(gameover_bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
             gameover.draw(g);
 
         }
 
     }
-
+    static double loops = 1;
+    static int adjustGel = 0;
+    static int adjustMask = 0;
+    static int adjustKills = 0;
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
 
@@ -419,6 +454,40 @@ public class GamePanel extends JPanel implements ActionListener {
             checkVirus();
             checkBulletCollision();
             country.checkPopulation();
+
+            if( (System.currentTimeMillis() - START_TIME) > roundLength){
+                System.out.println("GAME OVER: " + (System.currentTimeMillis() - START_TIME)/1000);
+            }
+
+            gameplay = new GameplayGraphics(this); // updates the timer on screen
+            Vaccine.updateProgress(Inventory.items[0].getTotalQuantity() - adjustGel, Inventory.items[1].getTotalQuantity()-adjustMask, Virus.totalNumberOfVirusesKilled-adjustKills);
+
+            if(Vaccine.progress >= 1){
+                Vaccine.vaccineIsReady = true;
+            }
+
+            if(Vaccine.vaccineIsReady){
+                Vaccine.timeToDevelop = 360 - (int)(GameplayGraphics.timeLeft*360)/GamePanel.roundLength;
+                System.out.println("Time to develop: " + Vaccine.timeToDevelop);
+                spawnTimeMask -= Vaccine.difficultyLvl*100;
+                spawnTimeVaccine = 15000;
+                numberOfVirusSpawned += Math.round(Vaccine.difficultyLvl);
+
+                adjustGel = Inventory.items[0].getTotalQuantity();
+                adjustMask = Inventory.items[1].getTotalQuantity();
+                adjustKills = Virus.totalNumberOfVirusesKilled;
+
+                Vaccine vaccine = new Vaccine(random.nextInt(SCREEN_WIDTH-100)+50, random.nextInt(SCREEN_HEIGHT-100)+50);
+                GamePanel.itemsOnScreen.add(vaccine);
+
+                Vaccine.difficultyLvl += 0.5;
+                Vaccine.updateThreshold();
+                Vaccine.vaccineIsReady = false;
+            }
+
+            if(GameplayGraphics.timeLeft < 0){
+                endGame();
+            }
 
         }else if(state == STATE.MENU ){
 
@@ -441,8 +510,12 @@ public class GamePanel extends JPanel implements ActionListener {
 
                         if(nSpawns%2==0){
                             System.out.println("BLOCK");
-                            for(int i=0; i<4; i++){
-                                virus = new Virus(random.nextInt(SCREEN_WIDTH), random.nextInt(SCREEN_WIDTH), random.nextInt(player.getSpeed()-2)+1);
+                            for(int i=0; i<numberOfVirusSpawned; i++){
+                                if(i%2==0){
+                                    virus = new Virus(random.nextInt(100)+GamePanel.SCREEN_WIDTH, random.nextInt(GamePanel.SCREEN_HEIGHT), random.nextInt(player.getSpeed()-2)+1);
+                                }else{
+                                    virus = new Virus(random.nextInt(GamePanel.SCREEN_WIDTH), random.nextInt(100)+GamePanel.SCREEN_HEIGHT, random.nextInt(player.getSpeed()-2)+1);
+                                }
                                 virus.setPlayer(player);
                                 virusOnScreen.add(virus);
                                 Virus.totalNumberOfViruses++;
@@ -465,7 +538,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 }
 
                 try {
-                    Thread.sleep(9000);
+                    Thread.sleep(spawnTimeVirus);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -486,7 +559,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 }
 
                 try {
-                    Thread.sleep(5000);
+                    Thread.sleep(spawnTimeGel);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -510,7 +583,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 }
 
                 try {
-                    Thread.sleep(18000);
+                    Thread.sleep(spawnTimeMask);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -522,16 +595,16 @@ public class GamePanel extends JPanel implements ActionListener {
         public void run() {
             while(true) {
 
-                if(state == STATE.GAME){
+                if(state == STATE.GAME && Vaccine.vaccineIsReady){
 
-                    Vaccine vaccine = new Vaccine(random.nextInt(SCREEN_WIDTH-100)+50, random.nextInt(SCREEN_HEIGHT-100)+50);
+                    //Vaccine vaccine = new Vaccine(random.nextInt(SCREEN_WIDTH-100)+50, random.nextInt(SCREEN_HEIGHT-100)+50);
 
-                    GamePanel.itemsOnScreen.add(vaccine);
+                    //GamePanel.itemsOnScreen.add(vaccine);
 
                 }
 
                 try {
-                    Thread.sleep(45000);
+                    Thread.sleep(spawnTimeVaccine);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

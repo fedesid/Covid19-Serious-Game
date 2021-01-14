@@ -1,10 +1,7 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.util.*;
 
 public class ReadScore {
 
@@ -19,10 +16,10 @@ public class ReadScore {
 
                 String[] score = sc.nextLine().split("[ ]+");
 
-                scores.add(new Score(score[0], score[1], Double.valueOf(score[2]), Integer.valueOf(score[3]), Integer.valueOf(score[4]),Integer.valueOf(score[5]), Integer.valueOf(score[6]), Integer.valueOf(score[7]), Integer.valueOf(score[8]), Integer.valueOf(score[9]), Integer.valueOf(score[10]) ));
+                scores.add(new Score(score[0], score[1], Double.valueOf(score[2]), Integer.valueOf(score[3]), Integer.valueOf(score[4]),Integer.valueOf(score[5]), Integer.valueOf(score[6]), Integer.valueOf(score[7]), Integer.valueOf(score[8]), Integer.valueOf(score[9]), Integer.valueOf(score[10]), Integer.valueOf(score[11]), Integer.valueOf(score[12]) ));
 
             }
-
+            Collections.sort(ReadScore.scores);
             sc.close();
             System.out.println(filename + " found!");
 

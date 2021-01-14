@@ -9,7 +9,7 @@ public class WriteScore {
         try{
             PrintWriter output = new PrintWriter(filename);
 
-            output.println(String.format("%-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s", "Name", "Country", "Score", "Kills", "Contacts", "Alive", "Infected", "Dead", "Gel", "Masks", "Vaccines"));
+            output.println(String.format("%-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s %-10s", "Name", "Country", "Score", "Kills", "Contacts", "Alive", "Infected", "Dead", "Healed", "Gel", "Masks", "Vaccines", "TimeToDev"));
 
             for(Iterator<Score> scoreIterator = ReadScore.scores.iterator(); scoreIterator.hasNext();){
                 Score score = scoreIterator.next();

@@ -138,7 +138,7 @@ public class MouseHandler implements MouseListener {
             }
 
             // Play button
-            if(gp.selection.play.checkClick(mouseEvent.getX(), mouseEvent.getY())){
+            if(gp.selection.play.checkClick(mouseEvent.getX(), mouseEvent.getY()) && GamePanel.usercountry != null && !gp.nameInputField.getText().isBlank()){
 
                 try {
                     System.out.println("PRESSED PLAY");

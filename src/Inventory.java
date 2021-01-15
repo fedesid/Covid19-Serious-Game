@@ -1,6 +1,8 @@
 import java.awt.*;
 import java.util.ArrayList;
 
+// Inventory class encapsulates the concept of an inventory in my game
+// It both takes care of the counting aspects (knowing how many items the player has) and of the visual aspects (it draw the inventory on the screen)
 public class Inventory {
     //static ArrayList<Integer> items = new ArrayList<int>();
     static ItemCount[] items;
@@ -45,6 +47,8 @@ public class Inventory {
 
     }
 
+    // If you have played the game you will know what this draw method does
+    // It prints a rectangle with labels and numbers representing the inventory of the player
     public void draw(Graphics g) {
 
         g.setColor(Color.white);

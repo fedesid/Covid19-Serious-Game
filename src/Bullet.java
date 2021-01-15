@@ -6,6 +6,7 @@ import java.io.IOException;
 
 import static java.lang.Math.atan2;
 
+// Bullet class which handles the bullets shot by the player
 public class Bullet extends Entity {
     static BufferedImage sprite;
     static {
@@ -57,6 +58,7 @@ public class Bullet extends Entity {
         System.out.println(xt + " " + yt);
     }
 
+    // Method move which moves the bullet in the right direction
     public void move(){
 
         xPos += (int) ((xt/5)*(speed));
@@ -64,6 +66,7 @@ public class Bullet extends Entity {
 
     }
 
+    // Checks if the bullet has gone beyond the screen, if so return true
     public boolean clear(){
 
         if(xPos < 0 || xPos > GamePanel.SCREEN_WIDTH){
@@ -76,6 +79,7 @@ public class Bullet extends Entity {
 
     }
 
+    // Method used to check if the virus has collided with the viruses on the screen
     public boolean collision(Virus virus){
         double distance = GamePanel.calcDistance(this.getXpos() + (this.getSize() /2), this.getYpos() + (this.getSize() /2), virus.getXpos() + (virus.getSize()/2), virus.getYpos() + (virus.getSize()/2));
         if( distance <= this.getSize() /2 + virus.getSize()/4){
@@ -105,6 +109,7 @@ public class Bullet extends Entity {
 
     }
 
+    // simple draw method which simply draws the bullet
     @Override
     public void draw(Graphics g) {
         g.drawImage(sprite, xPos, yPos, size, size, null);

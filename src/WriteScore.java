@@ -2,6 +2,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Iterator;
 
+// This class writes the scores (which are stored in the scores array list) on the file (score.txt)
 public class WriteScore {
 
     public WriteScore(String filename){

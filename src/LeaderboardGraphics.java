@@ -1,6 +1,15 @@
 import java.awt.*;
 import java.util.Iterator;
 
+/*
+    LeaderboardGraphics is a class that extends Menus
+    This class handle the GUI inside of the leaderboard screen
+
+    It prints the table together with the scores
+
+    Just run the game and look at it to understand the draw method better
+
+ */
 public class LeaderboardGraphics extends Menus {
 
     Button back;
@@ -64,9 +73,8 @@ public class LeaderboardGraphics extends Menus {
         Menus.drawCenteredString("NAME", xunit*2, xunit*6, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
         Menus.drawCenteredString("COUNTRY", xunit*2, xunit*10, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
         Menus.drawCenteredString("SCORE", xunit*2, xunit*14, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
-        //Menus.drawCenteredString("KILLS", xunit*2, xunit*14, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
-        //Menus.drawCenteredString("CONTACTS", xunit*2, xunit*18, yunit*3, yunit*4, font, new Color(0xFFFFFF), g);
 
+        // Loop through the scores so that it can print them. It will only print 7 scores and only the name, country, and #score of each score
         int count = 0;
         for(Iterator<Score> scoreIterator = ReadScore.scores.iterator(); scoreIterator.hasNext();){
             Score score = scoreIterator.next();

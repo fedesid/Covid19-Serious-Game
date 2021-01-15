@@ -1,3 +1,11 @@
+// I needed a way of keeping track of the number of items the player had
+// This class does just that
+/*
+    ItemCount objects have the ability of counting the current amount of items the player has and
+    the total amount of items the player has had since the start of the round
+
+    This class also implements Comparable since I need to compare objects of type ItemCount to numbers
+ */
 public class ItemCount implements Comparable {
 
     private int totalQuantity;

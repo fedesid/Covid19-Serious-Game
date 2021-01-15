@@ -8,7 +8,13 @@ import java.util.Random;
 
 // TODO virus that sneezes at you and does not move. it can spawn near the sides of the map
 // TODO vaccine deals "splash" damage. the closer the virus the higher the damage. further the virus is the less damage it takes (close to nothing)
-
+/*
+    The Virus class represents the concept of the virus in my game
+    The virus has a speed, range, health
+    By looking at the constructor it can be deduced that the size, range, health, and damage of the virus all depend on the speed
+    A fast virus will be small, deal a lot of damage but it will not have a lot of health
+    A slower virus will be bigger, deal not much damage, but it will have a lot of health
+ */
 public class Virus extends Entity {
 
     static int totalNumberOfViruses = 0;
@@ -57,6 +63,7 @@ public class Virus extends Entity {
         this.player = player;
     }
 
+    // This method moves the virus towards the player
     public void chase(){
 
         //distance = GamePanel.calcDistance(xpos, ypos, player.getXpos(), player.getYpos());
@@ -77,6 +84,7 @@ public class Virus extends Entity {
 
     }
 
+    // Checks if the virus has collided with the player
     public boolean collision(Player player){
         double distance = GamePanel.calcDistance(player.getXpos() + (player.getPlayerSize() /2), player.getYpos() + (player.getPlayerSize() /2), this.getXpos() + (this.getSize()/2), this.getYpos() + (this.getSize()/2));
         if( distance <= player.getPlayerSize() /2 + this.getRange()/2){
@@ -88,6 +96,7 @@ public class Virus extends Entity {
         return false;
     }
 
+    // I keep track of the number of times that the player has made contact with the virus
     public void upCollisions(){
 
         if(!prevContact && contact){
@@ -177,6 +186,7 @@ public class Virus extends Entity {
         //g.drawOval(xpos-size/(2*speed),ypos-size/(2*speed),range,range);
         g.drawImage(sprite, xpos, ypos, size, size, null);
 
+        // Virus health bar
         if(this.currentHealth != initHealth){
             g.setColor(Color.red);
             g.fillRect(xpos, ypos, this.initHealth, 5);

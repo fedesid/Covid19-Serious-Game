@@ -6,6 +6,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 
+// This class is used to represent the the country that is selected inside the player selection screen
+// The draw method prints the country on the screen (flag + name) and it also prints a blue circle around it if it was selected by the player
 public class CountryGraphics {
 
     static ArrayList<CountryGraphics> countryGraphicsList = new ArrayList<>();

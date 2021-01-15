@@ -1,5 +1,11 @@
 import java.awt.*;
 
+// GameplayGraphics is a class that extends Menus
+/*
+ In this class I handle the graphics for:
+    - the countdown (It is a button object because it was convinednd for me, however the player cannot interact with it=
+    - the vaccine progress bar
+ */
 public class GameplayGraphics extends Menus {
 
     Button countDown;

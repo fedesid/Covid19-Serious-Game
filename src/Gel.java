@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+// Simple Gel class that extends Item
+// This class represents the concept of the gel in the game
 public class Gel extends Item {
 
     static int totalNumberOfGelUsed = 0;

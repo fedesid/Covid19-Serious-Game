@@ -4,6 +4,15 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+// Player class represents the player
+/*
+    This class has access to a few singletons:
+        - Inventory
+        - InputHandler
+        - Country
+
+    This class handles the movements of the player and it draws the player on the screen
+ */
 public class Player extends Entity {
 
     String name;

@@ -3,6 +3,12 @@ import com.sun.tools.javac.Main;
 import javax.swing.*;
 import java.awt.*;
 
+/*
+    MenuGraphics is a class which extends Menus
+    This class draws the main menu
+    Notice how there is no draw method here
+    That's because is uses the one of its parent class, Menus
+ */
 public class MenuGraphics extends Menus {
 
     int btnSize = 300;

@@ -4,6 +4,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 
+// Simple Mask class that extends Item
+// This class represents the concept of masks in the game
 public class Mask extends Item {
 
     static int totalNumberOfMaskUsed = 0;

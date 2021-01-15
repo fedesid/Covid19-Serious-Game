@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.TreeMap;
 
+// This class reads the countries.txt file and stores its content in a TreeMap
 public class ReadCountries {
 
     TreeMap<String, Integer> countriesStats;

@@ -1,9 +1,13 @@
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-
+/*
+    This class represents the concept of a Vaccine inside the game
+    It is responsible for the logic of the game round as well.
+    The vaccine Threshold variable is a threshold which represent the amount of progress that the player needs to accomplish in order to obtain a vaccine
+    The progress variable represents the progress that the player has made towards obtaining a vaccine
+ */
 public class Vaccine extends Item {
 
     static int totalNumberOfVaccineUsed;
@@ -12,8 +16,8 @@ public class Vaccine extends Item {
 
     static int timeToDevelop = 0;
 
-    static double vaccineThreashold = ( 120 )/difficultyLvl;
-    static double progress = (Inventory.items[0].getTotalQuantity()+ (Inventory.items[1].getTotalQuantity()*5) )/Vaccine.vaccineThreashold;
+    static double vaccineThreshold = ( 120 )/difficultyLvl;
+    static double progress = (Inventory.items[0].getTotalQuantity()+ (Inventory.items[1].getTotalQuantity()*5) )/Vaccine.vaccineThreshold;
 
     static boolean vaccineIsReady = false;
 
@@ -31,11 +35,11 @@ public class Vaccine extends Item {
     }
 
     public static void updateThreshold(){
-        vaccineThreashold = ( 120 )/difficultyLvl;
+        vaccineThreshold = ( 120 )/difficultyLvl;
     }
 
     static void updateProgress(int gel, int mask, int kills){
-        progress = (gel + (mask*3) + (int)(kills/3) )/Vaccine.vaccineThreashold;
+        progress = (gel + (mask*3) + (int)(kills/3) )/Vaccine.vaccineThreshold;
     }
 
     @Override

@@ -1,3 +1,7 @@
+// This class represents the idea of a button inside my game
+// A button can be represented by a name (what's written on the button itself) a position (determined by x and y position) a size (width and height)
+// and the text information such the relative position inside the button (xoffest and yoffest) and the text size
+// I create objects of this class whenever I need to represent a button on the screen
 public class Button {
 
     String name;

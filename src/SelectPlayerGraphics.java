@@ -1,6 +1,11 @@
 import java.awt.*;
 import java.util.Iterator;
+/*
+    SelectPlayerGraphics is a class that extends Menus
 
+    This class is responsible for printing the player selection screen
+    I would suggest to look at it in the game making the draw method and the functioning of this class more clear
+ */
 public class SelectPlayerGraphics extends Menus {
 
     Button play, back, name;

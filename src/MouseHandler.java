@@ -1,7 +1,9 @@
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.Iterator;
-
+/*
+    This class implements the MouseListener and this handles the mouse inputs
+ */
 public class MouseHandler implements MouseListener {
 
     GamePanel gp;
@@ -27,14 +29,17 @@ public class MouseHandler implements MouseListener {
     public void mouseClicked(MouseEvent mouseEvent) {
 
     }
-
+    /*
+        When the mouse is pressed the event will be guided down many if statements making sure that the right decision is made
+     */
     @Override
     public void mousePressed(MouseEvent mouseEvent) {
 
+        // Gameplay state
         if(gp.state == GamePanel.STATE.GAME){
 
             if(input.one.isPressed()){ // Gel
-                if (Inventory.items[0].compareTo(0) > 0){
+                if (Inventory.items[0].compareTo(0) > 0){ // Making sure that there is at least one gel
 
                     Gel.totalNumberOfGelUsed++;
                     Inventory.items[0].upTotalCount();
@@ -53,7 +58,7 @@ public class MouseHandler implements MouseListener {
 
                 if(gp.player.maskOn){
                     gp.player.wearMask(false);
-                }else if(Inventory.items[1].compareTo(0) > 0){
+                }else if(Inventory.items[1].compareTo(0) > 0){ // Making sure that there is at least one mask
 
                     startTime = System.currentTimeMillis();
 
@@ -66,8 +71,8 @@ public class MouseHandler implements MouseListener {
 
             }
 
-            if(input.three.isPressed() || input.e.isPressed()){ // Vaccine
-                if (Inventory.items[2].compareTo(0) > 0){
+            if(input.three.isPressed()){ // Vaccine
+                if (Inventory.items[2].compareTo(0) > 0){ // Making sure that there is at least one vaccine
                     Vaccine.totalNumberOfVaccineUsed++;
 
                     Inventory.items[2].upTotalCount();
@@ -208,6 +213,8 @@ public class MouseHandler implements MouseListener {
 
     }
 
+    // This thread is activated when a mask is used
+    // It will remove the mask from the player after a certain amount of time
     Thread maskTime = new Thread(new Runnable() {
 
         public void run() {
@@ -232,6 +239,8 @@ public class MouseHandler implements MouseListener {
     });
 }
 
+// This class handles the scroll wheel of the mouse
+// The scroll wheel can be used to switch between items in the inventory
 class MouseWheelHandler implements MouseWheelListener {
 
     InputHandler input;

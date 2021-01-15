@@ -10,6 +10,7 @@ import java.io.IOException;
 
 public class GamePanel extends JPanel implements ActionListener {
 
+    // Different states of the game i.e. "menues"
     public enum STATE{
         MENU,
         GAME,
@@ -18,15 +19,18 @@ public class GamePanel extends JPanel implements ActionListener {
         END
     };
 
+    // initializing state to menu so that the game loads that at the start
     static public STATE state = STATE.MENU;
 
+    // window size
     public static final int SCREEN_WIDTH = 1200;
     public static final int SCREEN_HEIGHT = 800;
-    static final int DELAY = 20;
+    static final int DELAY = 20; // game delay time
     boolean running = false;
 
-    static double flashyDeath = 0.1;
+    static double flashyDeath = 0.1; // this variable is used to make the effect of damage when the health is below 10%
 
+    // Declaring singeltons that I will need later in the program
     Timer timer;
     Random random;
     InputHandler input;
@@ -36,6 +40,7 @@ public class GamePanel extends JPanel implements ActionListener {
     Score userScore;
     Country country;
     ReadScore rs;
+    Collisions collisions;
 
     MenuGraphics menu;
     LeaderboardGraphics leaderboard;
@@ -43,10 +48,11 @@ public class GamePanel extends JPanel implements ActionListener {
     GameOverGraphics gameover;
     GameplayGraphics gameplay;
 
-    JTextField nameInputField;
+    JTextField nameInputField; // name input field
 
     boolean moving = false;
 
+    // These arrays will contain objects that I need to keep track of
     static ArrayList<Bullet> bulletsOnScreen = new ArrayList<>();
     static ArrayList<Virus> virusOnScreen = new ArrayList<>();
     static ArrayList<Item> itemsOnScreen = new ArrayList<>();
@@ -64,9 +70,11 @@ public class GamePanel extends JPanel implements ActionListener {
     static int roundLength = 150000;
     static long START_TIME;
 
+    // Declaring player name and country
     String username;
     static String usercountry;
 
+    // Images that I use as background in the game
     static BufferedImage emptyBg;
     static BufferedImage mainscreen_bg;
     static BufferedImage leaderboard_bg;
@@ -74,7 +82,7 @@ public class GamePanel extends JPanel implements ActionListener {
     static BufferedImage gameover_bg;
 
     Toolkit toolkit = Toolkit.getDefaultToolkit();
-    Image earth_and_moon = toolkit.getImage("src/Sprites/Background/transparent.gif");
+    Image earth_and_moon = toolkit.getImage("src/Sprites/Background/transparent.gif"); // Animated gif
 
     static {
         try {
@@ -88,6 +96,8 @@ public class GamePanel extends JPanel implements ActionListener {
         }
     }
 
+    // Constructor of GamePanel class
+    // Here I initialize the fields that I need to be initialized as soon as the game starts
     public GamePanel() throws IOException {
         this.setPreferredSize(new Dimension(SCREEN_WIDTH, SCREEN_HEIGHT));
         this.setBackground(new Color(0x00FF32));
@@ -108,6 +118,7 @@ public class GamePanel extends JPanel implements ActionListener {
         nameInputField.setBackground(new Color(1, true));
         nameInputField.setForeground(new Color(0xFFFFFF));
 
+        // Starting threads that handle the spawn of items and viruses
         try{
             enemySpawner.start();
             gelSpawner.start();
@@ -118,6 +129,7 @@ public class GamePanel extends JPanel implements ActionListener {
             e.printStackTrace();
         }
 
+        // Reading the countires and loading them up in an array list
         ReadCountries rc = new ReadCountries("src/countries.txt");
         for(String key : rc.countriesStats.keySet()){
             Country c = new Country(key);
@@ -134,6 +146,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+    // Method startGame. When run it initializes all the fields that will be needed during the actual gameplay
     public void startGame() throws IOException {
 
         itemsOnScreen.removeAll(itemsOnScreen);
@@ -145,6 +158,7 @@ public class GamePanel extends JPanel implements ActionListener {
         mouseWheel = new MouseWheelHandler(this);
         country = new Country(usercountry);
         country.linkGamePanel(this);
+        collisions = new Collisions();
 
         inventory.linkInput(input);
         mouse.linkInput(input);
@@ -184,6 +198,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+    // Method endGame. When run it saves the score, writes it on the file and it prepares the fields to a possible new game start
     public void endGame(){
 
         userScore = new Score(player.name, player.country.country, 0, Virus.totalNumberOfVirusesKilled, Virus.totalNumberOfContacts, country.getHealthyPopulation(), country.getInfectedPopulation(), country.getDeadPopulation(), country.getHealedPopulation(), Inventory.items[0].getTotalQuantity(), Inventory.items[1].getTotalQuantity(), Inventory.items[2].getTotalQuantity(), Vaccine.timeToDevelop);
@@ -203,6 +218,8 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+    // The four methods below are used to calculate distances and angles throughout the program when needed
+    // Since I am working on a 2D plane I figured that this might come in handy
     public static double calcAngleSin(int x1, int y1, int x2, int y2){
         double hyp = calcDistance(x1, y1, x2, y2);
         return Math.toDegrees( Math.asin( (y1-y2)/hyp ) ) ;
@@ -221,132 +238,7 @@ public class GamePanel extends JPanel implements ActionListener {
         return (y1-y2)/(x2-x1);
     }
 
-    public void checkCollision(){
-
-        double distance;
-
-        // top border
-        if(player.getYpos() < 0){
-            player.setYpos(0);
-        }
-
-        // right border
-        distance = calcDistance(player.getXpos(), player.getYpos(), SCREEN_WIDTH, player.getYpos());
-        if(distance < player.getPlayerSize()){
-            player.setXpos(SCREEN_WIDTH - player.getPlayerSize());
-        }
-
-        // bottom border
-        distance = calcDistance(player.getXpos(), player.getYpos(), player.getXpos(), SCREEN_HEIGHT);
-        if(distance < player.getPlayerSize()){
-            player.setYpos(SCREEN_HEIGHT - player.getPlayerSize());
-        }
-
-        // left border
-        if(player.getXpos() < 0){
-            player.setXpos(0);
-        }
-    }
-
-    public void checkItem(){
-
-        if( itemsOnScreen.size() != 0 ){
-            for(Item item : itemsOnScreen){
-
-                if( item.collision(player) ){
-
-                    System.out.println("CONTACT");
-                    System.out.println(item.getClass().toString());
-
-                    if(item.getClass().toString().equals("class Gel")){
-                        Inventory.items[0].upCurrentCount(5);
-
-                    }else if(item.getClass().toString().equals("class Mask")){
-                        Inventory.items[1].upCurrentCount(1);
-
-                    }else if(item.getClass().toString().equals("class Vaccine")){
-                        Inventory.items[2].upCurrentCount(1);
-
-                    }
-                    itemsOnScreen.remove(item);
-                    break;
-
-                }
-
-            }
-        }
-
-    }
-
-    public void checkVirus(){
-
-        try{
-
-            if(!player.maskOn){
-                if(virusOnScreen.size() != 0){
-                    int c=0;
-                    for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext();){
-                        Virus virus = virusIterator.next();
-
-                        if( virus.collision(player) ){ // collision check
-                            // Virus has collided with player
-                            country.takeDamage(virus.getDamage());
-
-                            c++;
-                        }
-
-                    }
-
-                    if(c!=0){
-                        Virus.isInContact = true;
-                    }else {
-                        Virus.isInContact = false;
-                    }
-
-                }else{
-                    Virus.isInContact = false;
-                }
-            }
-
-
-        }catch (ConcurrentModificationException ignored){
-
-        }
-
-    }
-
-    public void checkBulletCollision(){
-
-        // list that contains all the bullets that did collide with a virus,
-        // I keep track of this so that I will be able to remove them from the list of bullets that did not hit
-        Collection<Bullet> tempBullet = new ArrayList<>();
-
-        try{
-            for(Iterator<Bullet> bulletIterator = GamePanel.bulletsOnScreen.iterator(); bulletIterator.hasNext();){
-                Bullet bullet = bulletIterator.next();
-
-                for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext(); ){
-                    Virus virus = virusIterator.next();
-
-                    if(bullet.collision(virus)){
-
-                        virus.takeDamage(bullet.getDamage(), virusIterator);
-
-                        tempBullet.add(bullet);
-
-                    }
-
-                }
-
-            }
-
-            bulletsOnScreen.removeAll(tempBullet);
-        }catch (ConcurrentModificationException ignored){
-
-        }
-
-    }
-
+    // Main paintComponent method
     public void paintComponent(Graphics g){
         super.paintComponent(g);
 
@@ -355,17 +247,18 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+    // Main draw method. Here I draw all the elements through the program
+    // I achieve this by calling the individual draw methods of different object when needed
     public void draw(Graphics g){
 
+        // When this statement is true I draw the elements that will be seen during the gameplay
         if(state == STATE.GAME){
-            g.drawImage(emptyBg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
-            g.drawImage(earth_and_moon, SCREEN_WIDTH/4, SCREEN_HEIGHT/4, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, null);
+            g.drawImage(emptyBg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null); // draw background
+            g.drawImage(earth_and_moon, SCREEN_WIDTH/4, SCREEN_HEIGHT/4, SCREEN_WIDTH/2, SCREEN_HEIGHT/2, null); // draw gif
 
-            int virusSize = GamePanel.virusOnScreen.size(); // control variable
-            // I was getting an error which I think it was caused when a new virus was created and added to the list while the program was inside this loop
-            // The error was ConcurrentModificationException
-            // I could enclose this part of the code with a try and catch block
 
+            // Iterate through the array lists that contain the objects Virus, and Items
+            // Thanks to inheritance I can simply call the draw method and it will know exactly what to do
             try{
                 for(Iterator<Virus> virusIterator = GamePanel.virusOnScreen.iterator(); virusIterator.hasNext();){
                     Virus virus = virusIterator.next();
@@ -395,8 +288,9 @@ public class GamePanel extends JPanel implements ActionListener {
 
             }
 
-            player.draw(g);
+            player.draw(g); // drawing the player
 
+            // When this if statement is true I draw a layer of red on the screen which indicates that the player is below 10% health
             if( (( (double)country.getHealthyPopulation()/(double)country.getInitialPopulation())*100) < 10 ){
                 g.setColor(new Color(255,0,0, (int)(100*flashyDeath)));
                 g.fillRect(0,0,SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -418,18 +312,22 @@ public class GamePanel extends JPanel implements ActionListener {
             inventory.draw(g);
             gameplay.draw(g);
 
+        // drawing the menu when in state menu
         }else if(state == STATE.MENU){
             nameInputField.setVisible(false);
             menu.draw(g);
 
+        // drawing the leaderboard when in state leaderboard
         }else if(state == STATE.LEADERBOARD){
             g.drawImage(leaderboard_bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
             leaderboard.draw(g);
 
+        // drawing the player selection menu when inside the player selection menu
         }else if(state == STATE.SELECTION){
             g.drawImage(playerselection_bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
             selection.draw(g);
 
+        // drawing the game over screen when in state end
         }else if(state == STATE.END){
             g.drawImage(gameover_bg, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, null);
             gameover.draw(g);
@@ -437,22 +335,25 @@ public class GamePanel extends JPanel implements ActionListener {
         }
 
     }
-    static double loops = 1;
+
+    // variables that I use in the level logic
     static int adjustGel = 0;
     static int adjustMask = 0;
     static int adjustKills = 0;
     @Override
     public void actionPerformed(ActionEvent actionEvent) {
 
+        // While inside the actual gameplay I execute this actions
         if(state == STATE.GAME){
             if(running){
                 player.movePlayer();
             }
 
-            checkCollision();
-            checkItem();
-            checkVirus();
-            checkBulletCollision();
+            // check the collisions between player-borders_of_screen player-items player-virus bullets-virus
+            collisions.checkCollision(this);
+            collisions.checkItem(this);
+            collisions.checkVirus(this);
+            collisions.checkBulletCollision();
             country.checkPopulation();
 
             if( (System.currentTimeMillis() - START_TIME) > roundLength){
@@ -466,6 +367,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 Vaccine.vaccineIsReady = true;
             }
 
+            // When this if statement is true I change the values of some variables making the game harder
             if(Vaccine.vaccineIsReady){
                 Vaccine.timeToDevelop = 360 - (int)(GameplayGraphics.timeLeft*360)/GamePanel.roundLength;
                 System.out.println("Time to develop: " + Vaccine.timeToDevelop);
@@ -485,7 +387,7 @@ public class GamePanel extends JPanel implements ActionListener {
                 Vaccine.vaccineIsReady = false;
             }
 
-            if(GameplayGraphics.timeLeft < 0){
+            if(GameplayGraphics.timeLeft < 0){ // end the game when the time left is 0
                 endGame();
             }
 
@@ -499,6 +401,7 @@ public class GamePanel extends JPanel implements ActionListener {
 
     }
 
+    // The four threads below are used to spawn things around the screen on random positions at "random" times
     Thread enemySpawner = new Thread(new Runnable() {
         int nSpawns = 1;
         public void run() {
@@ -506,9 +409,10 @@ public class GamePanel extends JPanel implements ActionListener {
 
                 try{
 
+                    // I had to make sure that elements were not spawning while outside the game screen
                     if(state == STATE.GAME ){
 
-                        if(nSpawns%2==0){
+                        if(nSpawns%2==0){ // once in a while spawn more than 1 virus. The number is controlled by the variable numberOfVirusesSpawned which increases as the game proceeds
                             System.out.println("BLOCK");
                             for(int i=0; i<numberOfVirusSpawned; i++){
                                 if(i%2==0){

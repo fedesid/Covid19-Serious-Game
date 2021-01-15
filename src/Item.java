@@ -1,6 +1,13 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+// Item class encapsulates the concept of an item in the game
+/*
+    Classes that extend this Item class:
+        - Gel
+        - Mask
+        - Vaccine
+ */
 public abstract class Item extends Entity {
     String name;
     BufferedImage sprite;

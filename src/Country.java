@@ -5,6 +5,20 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 
+// Country class which holds many information about the countries available to the player and the country that the player has chosen to play with
+// This class holds:
+/*
+    - list of all of the countries available in the game
+    - stats of the country chosen by the player:
+            - number of healthy people
+            - number of infected people
+            - number of dead people
+            - number of healed people
+    - Threads that change the number of infected and dead people every n seconds
+    - draw method which draws the Health bar at the top of the screen
+    - drawFlag method which draws the flag itself (this is no the player, this method pritns the flag + the name of the country right below it. I use this in the player selection screen)
+
+ */
 public class Country {
 
     static ArrayList<Country> countriesList = new ArrayList<>();
@@ -52,12 +66,14 @@ public class Country {
         this.gp = gp;
     }
 
+    // check method which checks whether the healthy population has reached 0. If so then ends the game
     public void checkPopulation(){
         if(healthyPopulation <= 0){
             gp.endGame();
         }
     }
 
+    // Method which deals damage. I the program calls this method whenever the player has collided with the virus
     public void takeDamage(int damage){
         //checkPopulation();
         int infected = getInitialPopulation()/10000;
@@ -68,6 +84,7 @@ public class Country {
         //checkPopulation();
     }
 
+    // Method that causes deaths. This method is called in the thread at the end of this class
     public void causeDeaths(int ratio){
         int deaths = getInitialPopulation()/ratio;
         if(deaths < getInfectedPopulation()){
@@ -80,6 +97,7 @@ public class Country {
         this.healthyPopulation = getInitialPopulation() - getInfectedPopulation() - getDeadPopulation();
     }
 
+    // Method that causes infections. This method is called in the thread at the end of this class
     public void causeInfections(int ratio){
         //checkPopulation();
         int infections = getInitialPopulation()/ratio;
@@ -94,6 +112,8 @@ public class Country {
         //checkPopulation();
     }
 
+    // Method which heals a portion of the infected population.
+    // This method is called when the player uses a vaccine
     public void healPopulation(int ratio){
         int cured = getInfectedPopulation()/ratio;
         this.healedPopulation += cured;

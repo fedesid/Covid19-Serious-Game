@@ -1,5 +1,7 @@
 import java.awt.*;
 
+// GameOverGraphics is a class that extends Menus
+// In this class I handle the graphics of the Game Over screen
 public class GameOverGraphics extends Menus {
 
     Button mainMenu, scores, restart, quit;

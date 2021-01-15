@@ -1,3 +1,7 @@
+/*
+    This class represents the Score of the player
+    The score is influenced by many factors, all of which can be seen in the constructor of this class.
+ */
 public class Score implements Comparable<Score> {
 
     private String playerName;
@@ -31,6 +35,8 @@ public class Score implements Comparable<Score> {
         this.score = calcScore();
     }
 
+    // This methods calculates the score.
+    // I came up with the formula thus it might not be the most accurate and fair way of scoring
     public double calcScore(){
 
         return  ( ( ( (double) (2*healed + alive)/(double) (infected + dead) ) +1 ) * ( (double) (kills+1)/ (double) (contacts+1) ) * ( ( (nOfGel+1) + (nOfMask+1)*2 ) + ( ( (Math.pow(nOfVaccine, 2)*100)+1 ) / ((double)(timeToDevelop/2)+1) )*20) );
@@ -63,6 +69,7 @@ public class Score implements Comparable<Score> {
         return String.format("%-10s %-10s %-10.0f %-10d %-10d %-10d %-10d %-10d %-10d %-10d %-10d %-10d %-10d", playerName, country, score, kills, contacts, alive, infected, dead, healed, nOfGel, nOfMask, nOfVaccine, timeToDevelop);
     }
 
+    // This method is used to print the score on the leaderboard menu
     public String leaderboard(){
         return String.format("%s %s %s %s %s", playerName, country, (int)score, kills, contacts);
     }

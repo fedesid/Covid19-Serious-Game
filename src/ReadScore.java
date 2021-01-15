@@ -3,6 +3,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.*;
 
+/*
+    This class reads the score.txt file and store its content in an ArrayList of type Score
+    If score.txt is not found it creates one
+ */
 public class ReadScore {
 
     static ArrayList<Score> scores = new ArrayList<>();
